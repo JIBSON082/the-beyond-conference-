@@ -1,1 +1,24 @@
-
+{
+  "name": "The Beyond Conference 2026",
+  "version": "1.0.0",
+  "description": "Official website for The Beyond Conference 2026 — Theme: MORE",
+  "conference": {
+    "theme": "MORE",
+    "date": "30th May, 2026",
+    "venue": "The New Great Hall, Lagos University Teaching Hospital (LUTH), Lagos",
+    "convener": "Bookola",
+    "specialFeature": "Official Launch of Beyond the Books"
+  },
+  "financials": {
+    "totalBudget": 2400000,
+    "currency": "NGN",
+    "note": "Update AMOUNT_RAISED constant in src/App.tsx to reflect current donations"
+  },
+  "emailjs": {
+    "note": "Configure EMAILJS_CONFIG in src/App.tsx with your EmailJS Service ID, Template ID, and Public Key",
+    "templateVariables": [
+      "unit", "volunteer_name", "volunteer_phone", "volunteer_email",
+      "attending", "mode", "unit_total", "all_stats", "timestamp"
+    ]
+  }
+}
