@@ -62,7 +62,7 @@ const LOGO_URL =
   'https://image2url.com/r2/default/images/1775526751389-21009a87-43a1-4cae-9afa-4ac23128ac50.jpg'
 
 const HERO_IMG =
-  'https://image2url.com/r2/default/images/1775527899819-63f8ce66-ffbe-4006-8888-e9bd42493819.jpg'
+  'https://image2url.com/r2/default/images/1775559218217-257adcce-d9db-4691-9ec1-f9cd3eb1bb2d.jpg'
 
 // ============================================================
 // VOLUNTEER UNIT DATA
