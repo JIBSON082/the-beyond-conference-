@@ -352,7 +352,7 @@ function HeroSection() {
           <div className="hero-detail-divider" aria-hidden="true" />
           <div className="hero-detail-item">
             <span className="detail-label">Venue</span>
-            <span className="detail-value">The New Great Hall, LUTH, Lagos</span>
+            <span className="detail-value">College of Medicine, LUTH, Lagos</span>
           </div>
           <div className="hero-detail-divider" aria-hidden="true" />
           <div className="hero-detail-item">
@@ -696,7 +696,7 @@ function Footer() {
         <div className="footer-event">
           <h4>Event Details</h4>
           <p>30th May, 2026</p>
-          <p>The New Great Hall</p>
+          <p>College of Medicine</p>
           <p>Lagos University Teaching Hospital</p>
           <p>Idi-Araba, Lagos</p>
         </div>
