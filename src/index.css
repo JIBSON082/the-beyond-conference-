@@ -98,7 +98,7 @@ ul { list-style: none; }
 /* Instagram icon directly beside logo */
 .nav-ig {
   display: flex; align-items: center; justify-content: center;
-  width: 44px; height: 44px;
+  width: 36px; height: 36px;
   border-radius: 50%;
   background: rgba(255,255,255,0.05);
   border: 1.5px solid rgba(255,255,255,0.15);
@@ -113,7 +113,7 @@ ul { list-style: none; }
   color: var(--gold-light);
   transform: scale(1.1);
 }
-.nav-ig svg { width: 20px; height: 20px; }
+.nav-ig svg { width: 18px; height: 18px; }
 
 /* Hamburger */
 .hamburger {
