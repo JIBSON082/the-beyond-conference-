@@ -2,72 +2,19 @@
  * THE BEYOND CONFERENCE 2026 — App.tsx
  *
  * ============================================================
- * GOOGLE APPS SCRIPT SETUP (replaces EmailJS)
+ * GOOGLE APPS SCRIPT SETUP
  * ============================================================
- *
  * 1. Go to https://script.google.com → New Project
- * 2. Paste the Apps Script code below into the editor
- * 3. Click Deploy → New Deployment → Web App
+ * 2. Paste the full contents of appscript.gs into the editor
+ * 3. Fill in your SPREADSHEET_ID and RECIPIENT_EMAILS in the script
+ * 4. Click Deploy → New Deployment → Web App
  *    - Execute as: Me
  *    - Who has access: Anyone
- * 4. Copy the deployed Web App URL → paste into APPS_SCRIPT_URL below
+ * 5. Copy the Web App URL and paste it as APPS_SCRIPT_URL below
  *
- * ─── PASTE THIS INTO YOUR APPS SCRIPT PROJECT ───────────────
- *
- * function doPost(e) {
- *   try {
- *     var data = JSON.parse(e.postData.contents);
- *     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
- *     sheet.appendRow([
- *       new Date(), data.name, data.phone, data.email,
- *       data.unit, data.attending, data.mode, data.timestamp
- *     ]);
- *     var statsBlock =
- *       'Current applications: ' + data.stats.total + '\n' +
- *       'Registration unit: '    + data.stats.registration + '\n' +
- *       'Media unit: '           + data.stats.media + '\n' +
- *       'Ushering unit: '        + data.stats.ushering + '\n' +
- *       'Protocol unit: '        + data.stats.protocol + '\n' +
- *       'Sponsorship unit: '     + data.stats.sponsorship + '\n' +
- *       'Logistics unit: '       + data.stats.logistics + '\n' +
- *       'Welfare unit: '         + data.stats.welfare;
- *
- *     var body =
- *       'NEW VOLUNTEER REGISTRATION — Beyond Conference 2026\n' +
- *       '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
- *       'VOLUNTEER DETAILS\n\n' +
- *       'Full Name:      ' + data.name      + '\n' +
- *       'Phone Number:   ' + data.phone     + '\n' +
- *       'Email Address:  ' + data.email     + '\n' +
- *       'Unit:           ' + data.unit      + '\n' +
- *       'Attending:      ' + data.attending + '\n' +
- *       'Mode:           ' + data.mode      + '\n' +
- *       'Submitted:      ' + data.timestamp + '\n\n' +
- *       '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
- *       '📊 STATISTICS\n\n' + statsBlock + '\n\n' +
- *       '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
- *
- *     GmailApp.sendEmail(
- *       Session.getActiveUser().getEmail(),
- *       'New Volunteer — ' + data.name + ' (' + data.unit + ') | Beyond 2026',
- *       body
- *     );
- *     return ContentService
- *       .createTextOutput(JSON.stringify({ success: true }))
- *       .setMimeType(ContentService.MimeType.JSON);
- *   } catch(err) {
- *     return ContentService
- *       .createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
- *       .setMimeType(ContentService.MimeType.JSON);
- *   }
- * }
- *
- * function doGet(e) {
- *   return ContentService
- *     .createTextOutput('Beyond Conference 2026 — Apps Script Active')
- *     .setMimeType(ContentService.MimeType.TEXT);
- * }
- * ─────────────────────────────────────────────────────────────
+ * UPDATE DONATION PROGRESS:
+ * Change AMOUNT_RAISED below to reflect the current total raised.
+ * ============================================================
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react'
@@ -77,11 +24,18 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
 
 // ============================================================
-// CONFIGURATION — EDIT THESE VALUES
+// CONFIGURATION
 // ============================================================
 
-const AMOUNT_RAISED = 0
-const TOTAL_BUDGET  = 2_400_000
+const AMOUNT_RAISED = 0 // Update this value (in Naira) as donations arrive
+
+const TOTAL_BUDGET = 2_400_000
+
+const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL'
+
+const LOGO_URL = 'https://image2url.com/r2/default/images/1775526751389-21009a87-43a1-4cae-9afa-4ac23128ac50.jpg'
+const HERO_IMG = 'https://image2url.com/r2/default/images/1775559218217-257adcce-d9db-4691-9ec1-f9cd3eb1bb2d.jpg'
+const INSTAGRAM_URL = 'https://www.instagram.com/the_beyond_community?igsh=eDVtdGpvM3B3bTF5'
 
 const ACCOUNT = {
   number: '7350104678',
@@ -89,21 +43,8 @@ const ACCOUNT = {
   name:   'Bukola D. Adewuyi',
 }
 
-/** Paste your deployed Google Apps Script URL here */
-const APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL'
-
-const INSTAGRAM_URL =
-  'https://www.instagram.com/the_beyond_community?igsh=eDVtdGpvM3B3bTF5'
-
-const LOGO_URL =
-  'https://image2url.com/r2/default/images/1775526751389-21009a87-43a1-4cae-9afa-4ac23128ac50.jpg'
-
-// ✦ NEW HERO IMAGE — Beyond Community banner with globe
-const HERO_IMG =
-  'https://image2url.com/r2/default/images/1775559218217-257adcce-d9db-4691-9ec1-f9cd3eb1bb2d.jpg'
-
 // ============================================================
-// VOLUNTEER UNIT DATA — all WhatsApp links now filled
+// VOLUNTEER DATA
 // ============================================================
 
 const WHATSAPP: Record<string, string> = {
@@ -132,64 +73,33 @@ const UNITS = [
 
 const formatNaira = (n: number) => '₦' + n.toLocaleString('en-NG')
 
-const getCount = (unit: string): number => {
+const incrementCount = (unit: string): { newCount: number; allStats: Record<string, number>; total: number } => {
   try {
     const all = JSON.parse(localStorage.getItem('beyond_counts') || '{}')
-    return Number(all[unit]) || 0
-  } catch { return 0 }
-}
-
-const getAllCounts = (): Record<string, number> => {
-  try {
-    const all = JSON.parse(localStorage.getItem('beyond_counts') || '{}')
-    return Object.fromEntries(UNITS.map(u => [u.name, Number(all[u.name]) || 0]))
-  } catch { return Object.fromEntries(UNITS.map(u => [u.name, 0])) }
-}
-
-const getTotalCount = (): number =>
-  UNITS.reduce((s, u) => s + getCount(u.name), 0)
-
-const incrementCount = (unit: string) => {
-  try {
-    const all = JSON.parse(localStorage.getItem('beyond_counts') || '{}')
-    all[unit] = (Number(all[unit]) || 0) + 1
+    all[unit] = (all[unit] || 0) + 1
     localStorage.setItem('beyond_counts', JSON.stringify(all))
-    return {
-      newCount: all[unit] as number,
-      stats: {
-        total:        UNITS.reduce((s, u) => s + (Number(all[u.name]) || 0), 0),
-        registration: Number(all['Registration Unit']) || 0,
-        media:        Number(all['Media Unit'])         || 0,
-        ushering:     Number(all['Ushering Unit'])      || 0,
-        protocol:     Number(all['Protocol Unit'])      || 0,
-        sponsorship:  Number(all['Sponsorship Unit'])   || 0,
-        logistics:    Number(all['Logistics Unit'])     || 0,
-        welfare:      Number(all['Welfare Unit'])       || 0,
-      },
-    }
+    const total = UNITS.reduce((s, u) => s + (all[u.name] || 0), 0)
+    return { newCount: all[unit], allStats: all, total }
   } catch {
-    return { newCount: 1, stats: { total: 1, registration: 0, media: 0, ushering: 0, protocol: 0, sponsorship: 0, logistics: 0, welfare: 0 } }
+    return { newCount: 1, allStats: {}, total: 1 }
   }
 }
 
 // ============================================================
-// INSTAGRAM ICON
+// GOOGLE APPS SCRIPT SUBMIT
 // ============================================================
 
-function InstagramIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg
-      width={size} height={size}
-      viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.8"
-      strokeLinecap="round" strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-    </svg>
-  )
+async function sendToAppsScript(payload: Record<string, string | number>) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') return
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(payload),
+    })
+  } catch (e) {
+    console.warn('Apps Script submission failed — recorded locally only.', e)
+  }
 }
 
 // ============================================================
@@ -198,30 +108,24 @@ function InstagramIcon({ size = 20 }: { size?: number }) {
 
 function Loader({ onDone }: { onDone: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
-
   useEffect(() => {
-    const tl = gsap.timeline({
-      onComplete: () => {
-        gsap.to(ref.current, {
-          duration: 0.7, opacity: 0, ease: 'power2.inOut', onComplete: onDone,
-        })
-      },
-    })
-    tl.to({}, { duration: 1.4 })
+    setTimeout(() => {
+      gsap.to(ref.current, {
+        opacity: 0, duration: 0.7, delay: 0.5,
+        onComplete: onDone,
+      })
+    }, 900)
   }, [onDone])
-
   return (
     <div ref={ref} className="loader-screen">
-      <div className="loader-logo">
-        <img src={LOGO_URL} alt="Beyond Conference" />
-      </div>
+      <div className="loader-logo"><img src={LOGO_URL} alt="Beyond Conference" /></div>
       <div className="loader-line" />
     </div>
   )
 }
 
 // ============================================================
-// NAVBAR  (+ Instagram link + border separator)
+// NAVBAR
 // ============================================================
 
 const NAV_SECTIONS = [
@@ -258,37 +162,24 @@ function Navbar() {
 
   const navigate = useCallback((href: string) => {
     setOpen(false)
-    setTimeout(() => {
-      const el = document.querySelector(href)
-      if (el) el.scrollIntoView({ behavior: 'smooth' })
-    }, 650)
+    setTimeout(() => document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' }), 650)
   }, [])
 
   return (
     <>
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-        {/* Logo */}
-        <button
-          className="nav-logo-btn"
-          onClick={() => navigate('#home')}
-          aria-label="Back to top"
-        >
+        <button className="nav-logo" onClick={() => navigate('#home')} aria-label="Back to top">
           <img src={LOGO_URL} alt="The Beyond Conference" />
         </button>
-
-        {/* Instagram link — centre of navbar */}
         <a
           href={INSTAGRAM_URL}
+          className="nav-instagram"
           target="_blank"
           rel="noopener noreferrer"
-          className="nav-instagram-link"
-          aria-label="Follow us on Instagram"
+          aria-label="Instagram"
         >
-          <InstagramIcon size={17} />
-          <span>@the_beyond_community</span>
+          Instagram
         </a>
-
-        {/* Hamburger */}
         <button
           className={`hamburger ${open ? 'active' : ''}`}
           onClick={() => setOpen(v => !v)}
@@ -299,31 +190,13 @@ function Navbar() {
         </button>
       </nav>
 
-      {/* ✦ Decorative gold border line below the navbar */}
-      <div className="navbar-separator" aria-hidden="true" />
-
-      {/* Full-screen overlay menu */}
-      <div
-        ref={overlayRef}
-        className="nav-overlay"
-        style={{ clipPath: 'circle(0% at 95% 5%)' }}
-        role="dialog" aria-modal="true" aria-hidden={!open}
-      >
+      <div ref={overlayRef} className="nav-overlay" style={{ clipPath: 'circle(0% at 95% 5%)' }}>
         <div ref={linksRef} className="nav-links">
           {NAV_SECTIONS.map(s => (
             <button key={s.href} className="nav-link-item" onClick={() => navigate(s.href)}>
               {s.label}
             </button>
           ))}
-          <a
-            href={INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nav-link-item nav-link-ig-item"
-          >
-            <InstagramIcon size={24} />
-            Instagram
-          </a>
         </div>
       </div>
     </>
@@ -331,275 +204,144 @@ function Navbar() {
 }
 
 // ============================================================
-// HERO SECTION — Mind-blowing GSAP + canvas rotating globe
+// GLOBE STAGE — orbital rings + particles
+// ============================================================
+
+function GlobeStage() {
+  const stageRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const isMobile = window.innerWidth < 768
+      const particleCount = isMobile ? 14 : 26
+
+      // Create particles
+      const container = stageRef.current?.querySelector('.globe-particles')
+      if (container) {
+        for (let i = 0; i < particleCount; i++) {
+          const dot = document.createElement('div')
+          dot.className = 'particle-dot'
+          const angle  = (i / particleCount) * Math.PI * 2
+          const radius = 38 + Math.random() * 46
+          dot.style.left = `${50 + Math.cos(angle) * radius}%`
+          dot.style.top  = `${50 + Math.sin(angle) * radius}%`
+          dot.style.opacity = '0'
+          container.appendChild(dot)
+
+          gsap.to(dot, {
+            opacity:  Math.random() * 0.85 + 0.15,
+            scale:    Math.random() * 2.5 + 0.4,
+            x:        (Math.random() - 0.5) * 28,
+            y:        (Math.random() - 0.5) * 28,
+            duration: 2.5 + Math.random() * 3,
+            repeat:   -1,
+            yoyo:     true,
+            ease:     'sine.inOut',
+            delay:    Math.random() * 2.5,
+          })
+        }
+      }
+
+      // Set ring initial tilt positions
+      gsap.set('#ring1', { rotationX: 68 })
+      gsap.set('#ring2', { rotationX: 40, rotationZ: 55 })
+      gsap.set('#ring3', { rotationX: 20, rotationZ: -35 })
+      gsap.set('#ring4', { rotationX: 82, rotationZ: 20 })
+
+      // Continuous rotation — all GPU-only transforms
+      gsap.to('#ring1', { rotation: 360,  duration: 14, repeat: -1, ease: 'none' })
+      gsap.to('#ring2', { rotation: -360, duration: 21, repeat: -1, ease: 'none' })
+      gsap.to('#ring3', { rotation: 360,  duration: 30, repeat: -1, ease: 'none' })
+      gsap.to('#ring4', { rotation: -360, duration: 40, repeat: -1, ease: 'none' })
+
+    }, stageRef)
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <div ref={stageRef} className="globe-stage" id="globeStage" aria-hidden="true">
+      <div className="globe-glow-outer" />
+      <div className="globe-glow-inner" />
+      <div className="ring ring-1" id="ring1" />
+      <div className="ring ring-2" id="ring2" />
+      <div className="ring ring-3" id="ring3" />
+      <div className="ring ring-4" id="ring4" />
+      <div className="globe-particles" />
+    </div>
+  )
+}
+
+// ============================================================
+// HERO
 // ============================================================
 
 function HeroSection() {
   const heroRef    = useRef<HTMLElement>(null)
   const imgRef     = useRef<HTMLDivElement>(null)
-  const canvasRef  = useRef<HTMLCanvasElement>(null)
-  const accentsRef = useRef<HTMLDivElement>(null)
   const eyebrowRef = useRef<HTMLDivElement>(null)
   const titleRef   = useRef<HTMLHeadingElement>(null)
   const detailsRef = useRef<HTMLDivElement>(null)
+  const stageRef   = useRef<HTMLDivElement>(null)
 
-  // ── Canvas: continuously rotating globe wireframe ──────────
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    let animId: number
-    let angle   = 0
-
-    function resize() {
-      const parent = canvas.parentElement
-      if (!parent) return
-      const r   = parent.getBoundingClientRect()
-      const dpr = Math.min(window.devicePixelRatio, 2)
-      canvas.width  = r.width  * dpr
-      canvas.height = r.height * dpr
-      canvas.style.width  = r.width  + 'px'
-      canvas.style.height = r.height + 'px'
-    }
-    resize()
-    window.addEventListener('resize', resize)
-
-    function draw() {
-      const ctx = canvas.getContext('2d')
-      if (!ctx) { animId = requestAnimationFrame(draw); return }
-
-      const dpr = Math.min(window.devicePixelRatio, 2)
-      const W   = canvas.width  / dpr
-      const H   = canvas.height / dpr
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.save()
-      ctx.scale(dpr, dpr)
-
-      // ── Globe centre (matches where the globe sits in the image) ──
-      const cx = W * 0.5
-      const cy = H * 0.62
-      const R  = Math.min(W * 0.22, H * 0.20, 130)
-
-      // Outer atmospheric glow
-      const glow = ctx.createRadialGradient(cx, cy, R * 0.3, cx, cy, R * 1.8)
-      glow.addColorStop(0,   'rgba(126, 200, 227, 0.18)')
-      glow.addColorStop(0.5, 'rgba(126, 200, 227, 0.06)')
-      glow.addColorStop(1,   'transparent')
-      ctx.fillStyle = glow
-      ctx.beginPath()
-      ctx.arc(cx, cy, R * 1.8, 0, Math.PI * 2)
-      ctx.fill()
-
-      // Gold inner core glow
-      const core = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.7)
-      core.addColorStop(0,   'rgba(193, 154, 38, 0.12)')
-      core.addColorStop(1,   'transparent')
-      ctx.fillStyle = core
-      ctx.beginPath()
-      ctx.arc(cx, cy, R * 0.7, 0, Math.PI * 2)
-      ctx.fill()
-
-      // ── Latitude rings ──────────────────────────────────────
-      for (let lat = -75; lat <= 75; lat += 15) {
-        const sinL  = Math.sin((lat * Math.PI) / 180)
-        const cosL  = Math.cos((lat * Math.PI) / 180)
-        const yOff  = R * sinL
-        const rx    = R * cosL
-        const eq    = lat === 0
-        const alpha = eq ? 0.7 : (0.12 + Math.abs(cosL) * 0.25)
-
-        ctx.beginPath()
-        ctx.ellipse(cx, cy + yOff, rx, rx * 0.12, 0, 0, Math.PI * 2)
-        ctx.strokeStyle = eq
-          ? `rgba(232, 187, 80, ${alpha})`
-          : `rgba(126, 200, 227, ${alpha})`
-        ctx.lineWidth = eq ? 1.8 : 0.7
-        ctx.stroke()
-      }
-
-      // ── Longitude arcs (spinning) ────────────────────────────
-      for (let lon = 0; lon < 180; lon += 18) {
-        const theta = ((lon * 2 + angle) * Math.PI) / 180
-        const cosT  = Math.cos(theta)
-
-        ctx.beginPath()
-        let moved = false
-        for (let phi = 0; phi <= Math.PI * 2 + 0.04; phi += 0.035) {
-          const x = cx + R * Math.sin(phi) * cosT
-          const y = cy - R * Math.cos(phi)
-          if (!moved) { ctx.moveTo(x, y); moved = true }
-          else ctx.lineTo(x, y)
-        }
-        const vis = Math.max(0, cosT)
-        ctx.strokeStyle = `rgba(193, 154, 38, ${vis * 0.55})`
-        ctx.lineWidth   = 0.9
-        ctx.stroke()
-      }
-
-      // ── Shimmering surface dots ──────────────────────────────
-      const t = Date.now() * 0.001
-      for (let i = 0; i < 14; i++) {
-        const phi2  = (i / 14) * Math.PI * 2 + angle * 0.012
-        const theta2 = Math.sin(i * 1.5) * Math.PI * 0.45
-        const x = cx + R * Math.cos(theta2) * Math.cos(phi2)
-        const y = cy - R * Math.sin(theta2)
-        if (Math.cos(phi2) > 0) {
-          const pulse = 0.35 + Math.sin(t * 1.8 + i) * 0.3
-          ctx.beginPath()
-          ctx.arc(x, y, 1.8, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(232, 187, 80, ${pulse})`
-          ctx.fill()
-        }
-      }
-
-      // ── Pole markers ─────────────────────────────────────────
-      ctx.beginPath()
-      ctx.arc(cx, cy - R, 3.5, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(232, 187, 80, 0.8)'
-      ctx.fill()
-      ctx.shadowColor = 'rgba(232, 187, 80, 0.6)'
-      ctx.shadowBlur  = 8
-      ctx.fill()
-      ctx.shadowBlur  = 0
-
-      ctx.beginPath()
-      ctx.arc(cx, cy + R, 3, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(126, 200, 227, 0.6)'
-      ctx.fill()
-
-      ctx.restore()
-      angle  += 0.38
-      animId  = requestAnimationFrame(draw)
-    }
-
-    draw()
-    return () => {
-      cancelAnimationFrame(animId)
-      window.removeEventListener('resize', resize)
-    }
-  }, [])
-
-  // ── GSAP: entrance + continuous accent float ───────────────
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const accents = accentsRef.current
-        ? Array.from(accentsRef.current.children) as HTMLElement[]
-        : []
+      const tl = gsap.timeline({ delay: 0.3 })
 
-      const tl = gsap.timeline({ delay: 0.25 })
-
-      // Image zoom-in + brighten
+      // Image cinematic entrance
       tl.fromTo(imgRef.current,
-        { scale: 1.12, opacity: 0, filter: 'brightness(0.35) saturate(0.5)' },
-        { scale: 1, opacity: 1, filter: 'brightness(1) saturate(1)', duration: 3, ease: 'power2.out' }
+        { scale: 1.15, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 2.4, ease: 'power2.out' }
       )
-
-      // Canvas globe fade-in
-      .fromTo(canvasRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 2.8, ease: 'power2.inOut' },
-        '-=2.5'
+      // Globe stage fades in
+      .fromTo(stageRef.current,
+        { opacity: 0, scale: 0.88 },
+        { opacity: 1, scale: 1, duration: 1.8, ease: 'power3.out' },
+        '-=2.0'
       )
-
-      // Accent rectangles burst in from random directions
-      .fromTo(accents,
-        { opacity: 0, scale: 0.1, rotation: (i: number) => (i % 2 === 0 ? -25 : 25) },
-        {
-          opacity: 1, scale: 1, rotation: 0,
-          stagger: { each: 0.07, from: 'random' },
-          duration: 1.4, ease: 'back.out(2.2)',
-        },
-        '-=2.2'
-      )
-
-      // Eyebrow
+      // Text reveals
       .fromTo(eyebrowRef.current,
-        { y: 45, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.2, ease: 'power3.out' },
-        '-=1.5'
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1, ease: 'power3.out' },
+        '-=1.3'
       )
-
-      // Title — dramatic slide
       .fromTo(titleRef.current,
-        { y: 100, opacity: 0, skewY: 5 },
-        { y: 0, opacity: 1, skewY: 0, duration: 1.6, ease: 'power3.out' },
-        '-=0.95'
+        { y: 100, opacity: 0, skewY: 4 },
+        { y: 0, opacity: 1, skewY: 0, duration: 1.4, ease: 'power3.out' },
+        '-=0.8'
+      )
+      .fromTo(detailsRef.current ? Array.from(detailsRef.current.children) : [],
+        { y: 40, opacity: 0 },
+        { y: 0, opacity: 1, stagger: 0.1, duration: 0.9, ease: 'power3.out' },
+        '-=0.8'
       )
 
-      // Details strip
-      .fromTo(
-        detailsRef.current ? Array.from(detailsRef.current.children) : [],
-        { y: 38, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.1, duration: 1, ease: 'power3.out' },
-        '-=0.9'
-      )
-
-      // Continuous gentle float for each accent rectangle
-      accents.forEach((el, i) => {
-        gsap.to(el, {
-          y:        `random(-22, 22)`,
-          x:        `random(-10, 10)`,
-          rotation: `random(-7, 7)`,
-          duration:  3.5 + i * 0.55,
-          ease:     'sine.inOut',
-          repeat:   -1,
-          yoyo:     true,
-          delay:     i * 0.35,
-        })
-      })
-
-      // Scroll parallax on image
+      // Parallax scroll on image
       gsap.to(imgRef.current, {
-        yPercent: 28,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: 'top top',
-          end:   'bottom top',
-          scrub: 1.8,
-        },
+        yPercent: 22, ease: 'none',
+        scrollTrigger: { trigger: heroRef.current, start: 'top top', end: 'bottom top', scrub: 1 },
       })
-    }, heroRef)
 
+      // Globe stage gentle float
+      gsap.to(stageRef.current, {
+        y: -18, duration: 4, ease: 'sine.inOut', repeat: -1, yoyo: true,
+      })
+
+    }, heroRef)
     return () => ctx.revert()
   }, [])
 
   return (
     <section id="home" ref={heroRef} className="hero-section">
-      {/* Background image */}
-      <div
-        ref={imgRef}
-        className="hero-image-bg"
-        style={{ backgroundImage: `url('${HERO_IMG}')` }}
-        aria-hidden="true"
-      />
-
-      {/* Canvas: rotating globe wireframe overlay */}
-      <canvas ref={canvasRef} className="hero-globe-canvas" aria-hidden="true" />
-
-      {/* Floating yellow + blue rectangle accents matching the image style */}
-      <div ref={accentsRef} className="hero-accents" aria-hidden="true">
-        <div className="accent accent-y1" />
-        <div className="accent accent-y2" />
-        <div className="accent accent-y3" />
-        <div className="accent accent-y4" />
-        <div className="accent accent-b1" />
-        <div className="accent accent-b2" />
-        <div className="accent accent-b3" />
-      </div>
-
-      {/* Gradient overlay */}
+      <div ref={imgRef} className="hero-image-bg" style={{ backgroundImage: `url('${HERO_IMG}')` }} aria-hidden="true" />
+      <div ref={stageRef}><GlobeStage /></div>
       <div className="hero-overlay" aria-hidden="true" />
 
-      {/* Content */}
       <div className="hero-content">
         <div ref={eyebrowRef} className="hero-eyebrow">Theme: MORE</div>
-
         <h1 ref={titleRef} className="hero-title">
           THE BEYOND<br />CONFERENCE
           <span className="hero-year">2026</span>
         </h1>
-
         <div ref={detailsRef} className="hero-details">
           <div className="hero-detail-item">
             <span className="detail-label">Date</span>
@@ -618,9 +360,7 @@ function HeroSection() {
           <div className="hero-detail-divider" aria-hidden="true" />
           <div className="hero-detail-item">
             <span className="detail-label">Special Feature</span>
-            <span className="detail-value">
-              Official Launch of <em>Beyond the Books</em>
-            </span>
+            <span className="detail-value">Official Launch of <em>Beyond the Books</em></span>
           </div>
         </div>
       </div>
@@ -634,41 +374,26 @@ function HeroSection() {
 }
 
 // ============================================================
-// VISION SECTION
+// VISION
 // ============================================================
 
 const PILLARS = [
-  { text: 'There is MORE to who you are.' },
-  { text: 'There is MORE to what you can achieve.' },
-  { text: 'There is MORE to what God can do through you.' },
-  { text: 'There is MORE waiting to be discovered within you.' },
+  'There is MORE to who you are.',
+  'There is MORE to what you can achieve.',
+  'There is MORE to what God can do through you.',
+  'There is MORE waiting to be discovered within you.',
 ]
 
 function VisionSection() {
   const ref = useRef<HTMLElement>(null)
-
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo('.vision-section .section-label', { y: 40, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 1,
-        scrollTrigger: { trigger: '.vision-section .section-label', start: 'top 82%' },
-      })
-      gsap.fromTo('.vision-heading', { y: 60, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 1.2, ease: 'power3.out',
-        scrollTrigger: { trigger: '.vision-heading', start: 'top 82%' },
-      })
-      gsap.fromTo('.vision-intro p', { y: 35, opacity: 0 }, {
-        y: 0, opacity: 1, stagger: 0.2, duration: 1, ease: 'power3.out',
-        scrollTrigger: { trigger: '.vision-intro', start: 'top 82%' },
-      })
-      gsap.fromTo('.vision-pillar', { y: 60, opacity: 0, scale: 0.97 }, {
-        y: 0, opacity: 1, scale: 1, stagger: 0.12, duration: 1, ease: 'power3.out',
-        scrollTrigger: { trigger: '.vision-pillars', start: 'top 78%' },
-      })
-      gsap.fromTo('.vision-closing', { y: 35, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 1,
-        scrollTrigger: { trigger: '.vision-closing', start: 'top 82%' },
-      })
+      const st = (trigger: string) => ({ scrollTrigger: { trigger, start: 'top 82%' } })
+      gsap.fromTo('.v-label',  { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.v-label') })
+      gsap.fromTo('.v-head',   { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.v-head') })
+      gsap.fromTo('.v-intro p',{ y:35,opacity:0 }, { y:0,opacity:1,stagger:0.2,duration:1, ...st('.v-intro') })
+      gsap.fromTo('.vision-pillar', { y:60,opacity:0,scale:0.97 }, { y:0,opacity:1,scale:1,stagger:0.12,duration:1,ease:'power3.out', scrollTrigger:{ trigger:'.vision-pillars',start:'top 78%' } })
+      gsap.fromTo('.v-closing',{ y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.v-closing') })
     }, ref)
     return () => ctx.revert()
   }, [])
@@ -676,41 +401,24 @@ function VisionSection() {
   return (
     <section id="vision" ref={ref} className="vision-section">
       <div className="section-container">
-        <div className="section-label">01 — Conference Vision</div>
-        <h2 className="vision-heading section-heading">
-          There Is <em>More</em><br />To You
-        </h2>
-        <div className="vision-intro">
-          <p>
-            The BEYOND Conference 2026 is a transformational gathering designed to awaken
-            young people to the truth that there is more to them than society, past
-            experiences, limitations, or self-doubt have defined.
-          </p>
-          <p>
-            The heart of this conference is to communicate a powerful, life-altering truth
-            to every person who walks through those doors.
-          </p>
+        <div className="section-label v-label">01 — Conference Vision</div>
+        <h2 className="section-heading v-head">There Is <em>More</em><br />To You</h2>
+        <div className="vision-intro v-intro">
+          <p>The BEYOND Conference 2026 is a transformational gathering designed to awaken young people to the truth that there is more to them than society, past experiences, limitations, or self-doubt have defined.</p>
+          <p>The heart of this conference is to communicate a powerful, life-altering truth to every person who walks through those doors.</p>
         </div>
         <div className="vision-pillars">
           {PILLARS.map((p, i) => (
             <div key={i} className="vision-pillar">
               <span className="pillar-number">0{i + 1}</span>
-              <p>
-                {p.text.includes('MORE') ? (
-                  <>
-                    {p.text.split('MORE')[0]}
-                    <strong>MORE</strong>
-                    {p.text.split('MORE')[1]}
-                  </>
-                ) : p.text}
-              </p>
+              <p>{p.split('MORE').map((part, j, arr) => (
+                <span key={j}>{part}{j < arr.length - 1 && <strong>MORE</strong>}</span>
+              ))}</p>
             </div>
           ))}
         </div>
-        <p className="vision-closing">
-          This conference will inspire young people to recognise the beauty, capacity,
-          and limitless potential deposited on their inside — and to take intentional steps
-          toward becoming all they were created to be.
+        <p className="vision-closing v-closing">
+          This conference will inspire young people to recognise the beauty, capacity, and limitless potential deposited on their inside — and to take intentional steps toward becoming all they were created to be.
         </p>
       </div>
     </section>
@@ -718,16 +426,8 @@ function VisionSection() {
 }
 
 // ============================================================
-// PARTNERSHIPS & SUPPORT SECTION
+// PARTNERSHIPS
 // ============================================================
-
-const SUPPORT_ITEMS = [
-  'Financial Sponsorship',
-  'Souvenir Production Support',
-  'Media Coverage',
-  'Refreshments Sponsorship',
-  'Equipment Sponsorship',
-]
 
 function PartnershipsSection() {
   const ref     = useRef<HTMLElement>(null)
@@ -736,8 +436,8 @@ function PartnershipsSection() {
 
   const pct = Math.min((AMOUNT_RAISED / TOTAL_BUDGET) * 100, 100)
 
-  const copy = (value: string, label: string) => {
-    navigator.clipboard.writeText(value).then(() => {
+  const copy = (val: string, label: string) => {
+    navigator.clipboard.writeText(val).then(() => {
       setCopied(label)
       setTimeout(() => setCopied(null), 2200)
     })
@@ -745,26 +445,12 @@ function PartnershipsSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo('.partnerships-section .section-label', { y: 40, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 1,
-        scrollTrigger: { trigger: '.partnerships-section .section-label', start: 'top 85%' },
-      })
-      gsap.fromTo('.partnerships-heading', { y: 60, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 1.2, ease: 'power3.out',
-        scrollTrigger: { trigger: '.partnerships-heading', start: 'top 82%' },
-      })
-      gsap.fromTo('.support-item', { x: -40, opacity: 0 }, {
-        x: 0, opacity: 1, stagger: 0.08, duration: 0.8, ease: 'power3.out',
-        scrollTrigger: { trigger: '.support-list', start: 'top 80%' },
-      })
-      gsap.fromTo(fillRef.current, { width: '0%' }, {
-        width: `${pct}%`, duration: 2.4, ease: 'power2.out',
-        scrollTrigger: { trigger: '.progress-container', start: 'top 80%' },
-      })
-      gsap.fromTo('.account-card', { y: 30, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 0.9, ease: 'power3.out',
-        scrollTrigger: { trigger: '.account-card', start: 'top 84%' },
-      })
+      const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 82%' } })
+      gsap.fromTo('.p-label', { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.p-label') })
+      gsap.fromTo('.p-head',  { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.p-head') })
+      gsap.fromTo('.support-item', { x:-40,opacity:0 }, { x:0,opacity:1,stagger:0.08,duration:0.8,ease:'power3.out', scrollTrigger:{ trigger:'.support-list',start:'top 80%' } })
+      gsap.fromTo(fillRef.current, { width:'0%' }, { width:`${pct}%`, duration:2.4, ease:'power2.out', scrollTrigger:{ trigger:'.progress-track',start:'top 80%' } })
+      gsap.fromTo('.account-card', { y:30,opacity:0 }, { y:0,opacity:1,duration:0.9,ease:'power3.out', ...st('.account-card') })
     }, ref)
     return () => ctx.revert()
   }, [pct])
@@ -772,22 +458,20 @@ function PartnershipsSection() {
   return (
     <section id="partnerships" ref={ref} className="partnerships-section">
       <div className="section-container">
-        <div className="section-label">02 — Call for Support</div>
-        <h2 className="partnerships-heading section-heading">
-          Partnerships<br />& <em>Support</em>
-        </h2>
+        <div className="section-label p-label">02 — Call for Support</div>
+        <h2 className="section-heading p-head">Partnerships<br />&amp; <em>Support</em></h2>
         <div className="partnerships-grid">
-          <div className="support-column">
+          <div>
             <p className="column-heading">Support Needed</p>
             <ul className="support-list">
-              {SUPPORT_ITEMS.map(item => (
+              {['Financial Sponsorship','Souvenir Production Support','Media Coverage','Refreshments Sponsorship','Equipment Sponsorship'].map(item => (
                 <li key={item} className="support-item">{item}</li>
               ))}
             </ul>
           </div>
-          <div className="funding-column">
+          <div>
             <p className="column-heading">Financial Goal</p>
-            <div className="progress-container">
+            <div style={{ marginBottom: '32px' }}>
               <div className="progress-amounts">
                 <span className="amount-raised">{formatNaira(AMOUNT_RAISED)}</span>
                 <span className="amount-total">of {formatNaira(TOTAL_BUDGET)}</span>
@@ -805,17 +489,14 @@ function PartnershipsSection() {
                 { label: 'Account Name',   val: ACCOUNT.name   },
               ].map(({ label, val }) => (
                 <div
-                  key={label}
-                  className="account-row"
+                  key={label} className="account-row"
                   onClick={() => copy(val, label)}
-                  role="button"
-                  tabIndex={0}
+                  role="button" tabIndex={0}
                   onKeyDown={e => e.key === 'Enter' && copy(val, label)}
-                  aria-label={`Copy ${label}: ${val}`}
                 >
                   <span className="account-field-label">{label}</span>
                   <span className="account-value">{val}</span>
-                  <span className="copy-btn">{copied === label ? 'Copied ✓' : 'Copy'}</span>
+                  <span className="copy-btn">{copied === label ? 'Copied' : 'Copy'}</span>
                 </div>
               ))}
             </div>
@@ -827,216 +508,128 @@ function PartnershipsSection() {
 }
 
 // ============================================================
-// VOLUNTEER MODAL — Google Apps Script + WhatsApp redirect
+// VOLUNTEER MODAL
 // ============================================================
 
 interface FormState {
-  name:      string
-  phone:     string
-  email:     string
+  name: string; phone: string; email: string
   attending: '' | 'Yes' | 'No'
-  mode:      '' | 'Virtual' | 'Physical'
+  mode: '' | 'Virtual' | 'Physical'
 }
 
-const EMPTY_FORM: FormState = { name: '', phone: '', email: '', attending: '', mode: '' }
 type SubmitStatus = 'idle' | 'sending' | 'success' | 'error'
 
-function VolunteerModal({
-  unit,
-  onClose,
-}: {
-  unit:    string
-  onClose: () => void
-}) {
-  const ref                     = useRef<HTMLDivElement>(null)
-  const [form,   setForm]       = useState<FormState>(EMPTY_FORM)
-  const [status, setStatus]     = useState<SubmitStatus>('idle')
-  const [errMsg, setErrMsg]     = useState('')
-  const waLink                  = WHATSAPP[unit] || null
+function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [form, setForm]     = useState<FormState>({ name:'', phone:'', email:'', attending:'', mode:'' })
+  const [status, setStatus] = useState<SubmitStatus>('idle')
 
-  // Entrance animation
   useEffect(() => {
-    gsap.fromTo(ref.current,
-      { y: 80, opacity: 0, scale: 0.96 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.65, ease: 'power3.out' }
-    )
+    gsap.fromTo(ref.current, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: 'power3.out' })
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
   }, [])
 
   const close = useCallback(() => {
-    gsap.to(ref.current, {
-      y: 60, opacity: 0, duration: 0.4, ease: 'power3.in', onComplete: onClose,
-    })
+    gsap.to(ref.current, { y: 80, opacity: 0, duration: 0.4, ease: 'power3.in', onComplete: onClose })
   }, [onClose])
 
-  const openWhatsApp = () => {
-    if (waLink) window.open(waLink, '_blank', 'noopener,noreferrer')
-  }
+  const setField = <K extends keyof FormState>(k: K, v: FormState[K]) =>
+    setForm(f => ({ ...f, [k]: v }))
 
   const submit = async () => {
-    if (!form.name.trim() || !form.phone.trim() || !form.email.trim() || !form.attending || !form.mode) {
-      setErrMsg('Please fill in all fields before submitting.')
+    if (!form.name || !form.phone || !form.email || !form.attending || !form.mode) {
+      alert('Please complete all fields before confirming.')
       return
     }
-    setErrMsg('')
     setStatus('sending')
 
-    const { stats } = incrementCount(unit)
+    const { newCount, allStats, total } = incrementCount(unit)
+    const now = new Date().toLocaleString('en-NG', { timeZone:'Africa/Lagos', dateStyle:'long', timeStyle:'short' })
 
-    const payload = {
-      name:      form.name.trim(),
-      phone:     form.phone.trim(),
-      email:     form.email.trim(),
-      unit,
-      attending: form.attending,
-      mode:      form.mode,
-      timestamp: new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }),
-      stats,
-    }
+    await sendToAppsScript({
+      name: form.name, phone: form.phone, email: form.email,
+      unit, attending: form.attending, mode: form.mode,
+      timestamp: now,
+      // Per-unit counts for Apps Script email
+      totalAll: total,
+      countRegistration: allStats['Registration Unit'] || 0,
+      countMedia:        allStats['Media Unit']        || 0,
+      countUshering:     allStats['Ushering Unit']     || 0,
+      countProtocol:     allStats['Protocol Unit']     || 0,
+      countSponsorship:  allStats['Sponsorship Unit']  || 0,
+      countLogistics:    allStats['Logistics Unit']    || 0,
+      countWelfare:      allStats['Welfare Unit']      || 0,
+    })
 
-    try {
-      // mode: 'no-cors' is required for Google Apps Script from a browser.
-      // We cannot read the response body in this mode, so we assume success
-      // as long as the network request doesn't throw. The Apps Script will
-      // still receive and process the data normally.
-      await fetch(APPS_SCRIPT_URL, {
-        method:  'POST',
-        mode:    'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body:    JSON.stringify(payload),
-      })
-      setStatus('success')
-    } catch {
-      setStatus('error')
-      setErrMsg('Network error. Please check your connection and try again.')
-    }
+    setStatus('success')
+    setTimeout(() => {
+      window.open(WHATSAPP[unit], '_blank', 'noopener,noreferrer')
+      close()
+    }, 2600)
   }
 
-  const change = (field: keyof FormState, val: string) =>
-    setForm(f => ({ ...f, [field]: val } as FormState))
-
   return (
-    <div
-      className="modal-backdrop"
-      onClick={e => e.target === e.currentTarget && close()}
-    >
-      <div
-        ref={ref}
-        className="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-label={`Volunteer registration — ${unit}`}
-      >
-        <button className="modal-close" onClick={close} aria-label="Close">✕ Close</button>
-
-        {/* Header */}
+    <div className="modal-backdrop" onClick={close}>
+      <div ref={ref} className="modal" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={close}>Close</button>
         <div className="modal-header">
-          <p className="modal-unit-label">{unit}</p>
-          <h3 className="modal-title">Volunteer Registration</h3>
+          <p className="modal-unit-label">Joining</p>
+          <h3 className="modal-title">{unit}</h3>
         </div>
 
-        {/* ── Success state ── */}
         {status === 'success' ? (
           <div className="modal-success">
-            <div className="success-check">✓</div>
-            <h4>You're In!</h4>
-            <p>
-              Your registration for the <strong>{unit}</strong> has been received.
-              Join the WhatsApp group to stay connected with your team.
-            </p>
-            {waLink && (
-              <button className="whatsapp-btn" onClick={openWhatsApp}>
-                {/* WhatsApp logo */}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-                Join {unit} WhatsApp Group
-              </button>
-            )}
-            <button className="modal-done-btn" onClick={close}>Done</button>
+            <div className="success-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <p>Welcome to the {unit}.</p>
+            <p className="redirect-note">Taking you to the group chat now...</p>
           </div>
         ) : (
-          /* ── Form state ── */
           <div className="modal-form">
             <div className="form-field">
               <label htmlFor="vol-name">Full Name</label>
-              <input
-                id="vol-name" type="text" placeholder="Your full name"
-                value={form.name} onChange={e => change('name', e.target.value)}
-                disabled={status === 'sending'}
-              />
+              <input id="vol-name" type="text" placeholder="Enter your full name" value={form.name} onChange={e => setField('name', e.target.value)} autoComplete="name" />
             </div>
-
             <div className="form-field">
               <label htmlFor="vol-phone">Phone Number</label>
-              <input
-                id="vol-phone" type="tel" placeholder="e.g. 08012345678"
-                value={form.phone} onChange={e => change('phone', e.target.value)}
-                disabled={status === 'sending'}
-              />
+              <input id="vol-phone" type="tel" placeholder="e.g. 08012345678" value={form.phone} onChange={e => setField('phone', e.target.value)} autoComplete="tel" />
             </div>
-
             <div className="form-field">
               <label htmlFor="vol-email">Email Address</label>
-              <input
-                id="vol-email" type="email" placeholder="your@email.com"
-                value={form.email} onChange={e => change('email', e.target.value)}
-                disabled={status === 'sending'}
-              />
+              <input id="vol-email" type="email" placeholder="your@email.com" value={form.email} onChange={e => setField('email', e.target.value)} autoComplete="email" />
             </div>
-
-            <div className="form-field">
-              <label>Will you be attending the conference?</label>
-              <div className="radio-group">
-                {(['Yes', 'No'] as const).map(opt => (
-                  <label key={opt} className={`radio-btn ${form.attending === opt ? 'active' : ''}`}>
-                    <input
-                      type="radio" name="attending" value={opt}
-                      checked={form.attending === opt}
-                      onChange={() => change('attending', opt)}
-                      disabled={status === 'sending'}
-                    />
-                    {opt}
-                  </label>
-                ))}
+            <div className="form-row">
+              <div className="form-field">
+                <label>Will you be attending?</label>
+                <div className="radio-group">
+                  {(['Yes','No'] as const).map(opt => (
+                    <label key={opt} className={`radio-option ${form.attending === opt ? 'selected' : ''}`}>
+                      <input type="radio" name="attending" value={opt} checked={form.attending === opt} onChange={() => setField('attending', opt)} />
+                      {opt}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="form-field">
+                <label>Participation Mode</label>
+                <div className="radio-group">
+                  {(['Virtual','Physical'] as const).map(opt => (
+                    <label key={opt} className={`radio-option ${form.mode === opt ? 'selected' : ''}`}>
+                      <input type="radio" name="mode" value={opt} checked={form.mode === opt} onChange={() => setField('mode', opt)} />
+                      {opt}
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
-
-            <div className="form-field">
-              <label>Participation Mode</label>
-              <div className="radio-group">
-                {(['Virtual', 'Physical'] as const).map(opt => (
-                  <label key={opt} className={`radio-btn ${form.mode === opt ? 'active' : ''}`}>
-                    <input
-                      type="radio" name="mode" value={opt}
-                      checked={form.mode === opt}
-                      onChange={() => change('mode', opt)}
-                      disabled={status === 'sending'}
-                    />
-                    {opt}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {errMsg && <p className="form-error" role="alert">{errMsg}</p>}
-
-            <button
-              className={`submit-btn ${status === 'sending' ? 'loading' : ''}`}
-              onClick={submit}
-              disabled={status === 'sending'}
-            >
-              {status === 'sending' ? (
-                <><span className="spinner" /> Submitting…</>
-              ) : (
-                'Confirm Registration'
-              )}
+            {status === 'error' && <p className="error-msg">Something went wrong. Please try again.</p>}
+            <button className="confirm-btn" onClick={submit} disabled={status === 'sending'}>
+              {status === 'sending' ? 'Submitting...' : 'Confirm Registration'}
             </button>
-
-            {status === 'error' && (
-              <p className="form-error" role="alert" style={{ marginTop: 12 }}>
-                Something went wrong. Please try again.
-              </p>
-            )}
           </div>
         )}
       </div>
@@ -1045,37 +638,20 @@ function VolunteerModal({
 }
 
 // ============================================================
-// VOLUNTEERS SECTION
+// VOLUNTEERS
 // ============================================================
 
 function VolunteersSection() {
-  const ref = useRef<HTMLElement>(null)
-  const [activeUnit, setActiveUnit] = useState<string | null>(null)
-  const [counts,     setCounts]     = useState<Record<string, number>>(getAllCounts)
-
-  const handleClose = () => {
-    setCounts(getAllCounts())   // refresh counts after any submission
-    setActiveUnit(null)
-  }
+  const ref           = useRef<HTMLElement>(null)
+  const [active, setActive] = useState<string | null>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo('.volunteers-section .section-label', { y: 40, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 1,
-        scrollTrigger: { trigger: '.volunteers-section .section-label', start: 'top 85%' },
-      })
-      gsap.fromTo('.volunteers-section .section-heading', { y: 60, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 1.2, ease: 'power3.out',
-        scrollTrigger: { trigger: '.volunteers-section .section-heading', start: 'top 82%' },
-      })
-      gsap.fromTo('.volunteers-intro', { y: 35, opacity: 0 }, {
-        y: 0, opacity: 1, duration: 1,
-        scrollTrigger: { trigger: '.volunteers-intro', start: 'top 85%' },
-      })
-      gsap.fromTo('.unit-card', { y: 55, opacity: 0, scale: 0.96 }, {
-        y: 0, opacity: 1, scale: 1, stagger: 0.09, duration: 0.95, ease: 'power3.out',
-        scrollTrigger: { trigger: '.units-grid', start: 'top 80%' },
-      })
+      const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 85%' } })
+      gsap.fromTo('.vol-label', { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.vol-label') })
+      gsap.fromTo('.vol-head',  { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.vol-head') })
+      gsap.fromTo('.vol-intro', { y:30,opacity:0 }, { y:0,opacity:1,duration:0.9, ...st('.vol-intro') })
+      gsap.fromTo('.unit-card', { y:65,opacity:0 }, { y:0,opacity:1,stagger:0.1,duration:1,ease:'power3.out', scrollTrigger:{ trigger:'.units-grid',start:'top 78%' } })
     }, ref)
     return () => ctx.revert()
   }, [])
@@ -1083,87 +659,72 @@ function VolunteersSection() {
   return (
     <section id="volunteers" ref={ref} className="volunteers-section">
       <div className="section-container">
-        <div className="section-label">03 — Serve With Us</div>
-        <h2 className="section-heading">
-          Call for<br /><em>Volunteers</em>
-        </h2>
-        <p className="volunteers-intro">
-          The Beyond Conference 2026 is powered by people — passionate, dedicated
-          individuals who believe in the message of MORE. Choose your unit and be
-          part of something extraordinary.
-        </p>
-
+        <div className="section-label vol-label">03 — Join the Team</div>
+        <h2 className="section-heading vol-head">Call for<br /><em>Volunteers</em></h2>
+        <p className="volunteers-intro vol-intro">The Beyond Conference 2026 is powered by a team of committed, passionate individuals. Choose a unit that resonates with you, complete the form, and become part of something greater than yourself.</p>
         <div className="units-grid">
-          {UNITS.map((u, i) => (
-            <div key={u.name} className="unit-card">
-              <span className="unit-number">0{i + 1}</span>
-              <h3 className="unit-name">{u.name}</h3>
-              <p className="unit-desc">{u.desc}</p>
-              <div className="unit-count-badge">
-                <span className="count-dot" />
-                <span>
-                  {counts[u.name] ?? 0} volunteer{(counts[u.name] ?? 0) !== 1 ? 's' : ''}
-                </span>
-              </div>
-              <button className="join-btn" onClick={() => setActiveUnit(u.name)}>
-                Join This Unit
-              </button>
-            </div>
+          {UNITS.map((unit, i) => (
+            <article key={unit.name} className="unit-card">
+              <div className="unit-number" aria-hidden="true">0{i + 1}</div>
+              <h3 className="unit-name">{unit.name}</h3>
+              <p className="unit-desc">{unit.desc}</p>
+              <button className="join-btn" onClick={() => setActive(unit.name)}>Join Unit</button>
+            </article>
           ))}
         </div>
       </div>
-
-      {activeUnit && (
-        <VolunteerModal unit={activeUnit} onClose={handleClose} />
-      )}
+      {active && <VolunteerModal unit={active} onClose={() => setActive(null)} />}
     </section>
   )
 }
 
 // ============================================================
-// FOOTER — with Instagram link
+// FOOTER
 // ============================================================
 
 function Footer() {
+  const scrollTo = (href: string) =>
+    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+
   return (
-    <footer className="site-footer">
-      <div className="footer-inner">
+    <footer className="footer">
+      <div className="footer-container">
         <div className="footer-brand">
           <img src={LOGO_URL} alt="The Beyond Conference" className="footer-logo" />
-          <div className="footer-brand-text">
-            <p className="footer-name">The Beyond Conference 2026</p>
-            <p className="footer-sub">Theme: MORE · 30th May 2026 · LUTH, Lagos</p>
-          </div>
+          <p>The Beyond Conference 2026</p>
+          <p className="footer-tagline">There Is MORE.</p>
+          <a href={INSTAGRAM_URL} className="footer-instagram" target="_blank" rel="noopener noreferrer">
+            Instagram
+          </a>
         </div>
-
-        <div className="footer-divider" />
-
-        <a
-          href={INSTAGRAM_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="footer-instagram"
-          aria-label="Follow on Instagram"
-        >
-          <InstagramIcon size={24} />
-          <div>
-            <span className="footer-ig-handle">@the_beyond_community</span>
-            <span className="footer-ig-sub">Follow us on Instagram</span>
-          </div>
-        </a>
-
-        <div className="footer-divider" />
-
-        <p className="footer-copy">
-          © {new Date().getFullYear()} The Beyond Community · All rights reserved
-        </p>
+        <div className="footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            {NAV_SECTIONS.map(s => (
+              <li key={s.href}>
+                <a href={s.href} onClick={e => { e.preventDefault(); scrollTo(s.href) }}>{s.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="footer-event">
+          <h4>Event Details</h4>
+          <p>30th May, 2026</p>
+          <p>The New Great Hall</p>
+          <p>Lagos University Teaching Hospital</p>
+          <p>Idi-Araba, Lagos</p>
+        </div>
+      </div>
+      <div className="footer-bottom">
+        <p>&copy; {new Date().getFullYear()} The Beyond Conference. All rights reserved.</p>
+        <p>Convened by Bookola</p>
       </div>
     </footer>
   )
 }
 
 // ============================================================
-// APP ROOT
+// ROOT APP
 // ============================================================
 
 export default function App() {
@@ -1172,12 +733,15 @@ export default function App() {
   return (
     <>
       {!loaded && <Loader onDone={() => setLoaded(true)} />}
-      <div className={`site ${loaded ? 'site--visible' : 'site--hidden'}`}>
+      <div style={{ visibility: loaded ? 'visible' : 'hidden' }}>
         <Navbar />
         <main>
           <HeroSection />
+          <div className="gold-line" />
           <VisionSection />
+          <div className="gold-line" />
           <PartnershipsSection />
+          <div className="gold-line" />
           <VolunteersSection />
         </main>
         <Footer />
