@@ -329,7 +329,7 @@ function HeroSection() {
       <div
         ref={imgRef}
         className="hero-image-bg"
-        style={{ backgroundImage: `url('${HERO_IMG}')` }}
+        style={{}}
         aria-hidden="true"
       />
       <div className="hero-overlay" aria-hidden="true" />
