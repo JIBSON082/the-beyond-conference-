@@ -442,7 +442,7 @@ ul { list-style: none; }
 /* Footer Instagram icon */
 .footer-ig {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 52px; height: 52px;
+  width: 42px; height: 42px;
   border-radius: 50%;
   background: rgba(255,255,255,0.05);
   border: 1.5px solid rgba(255,255,255,0.15);
