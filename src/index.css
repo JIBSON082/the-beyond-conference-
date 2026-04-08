@@ -327,13 +327,41 @@ ul { list-style: none; }
 .support-item::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; transition: transform 0.3s; }
 .support-item:hover { color: var(--text-bright); padding-left: 8px; }
 .support-item:hover::before { transform: scale(1.5); }
-.progress-amounts { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
-.amount-raised { font-family: var(--font-display); font-size: clamp(2rem,4vw,3rem); font-weight: 500; color: var(--gold-light); letter-spacing: -0.02em; }
-.amount-total { font-size: 0.85rem; color: var(--text-dim); letter-spacing: 0.05em; }
+.progress-amounts {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(212,168,42,0.15);
+}
+.amount-raised {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem,4vw,3.4rem);
+  font-weight: 500;
+  color: var(--gold-light);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-shadow: 0 0 40px rgba(212,168,42,0.3);
+}
+.amount-total {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding-bottom: 4px;
+}
 .progress-track { height: 3px; background: var(--white-line); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
 .progress-fill { height: 100%; background: linear-gradient(to right,var(--gold),var(--gold-light)); border-radius: 2px; position: relative; will-change: width; }
 .progress-fill::after { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 9px; height: 9px; border-radius: 50%; background: var(--gold-light); box-shadow: 0 0 10px rgba(242,200,75,0.7); }
-.progress-percentage { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); }
+.progress-percentage {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-top: 10px;
+}
 .account-card { background: var(--bg-card); border: 1px solid var(--gold-border); padding: clamp(20px,3vw,32px); position: relative; overflow: hidden; }
 .account-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(to right,var(--gold),var(--gold-light),var(--gold)); }
 .account-label { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
