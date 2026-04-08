@@ -113,7 +113,7 @@ ul { list-style: none; }
   color: var(--gold-light);
   transform: scale(1.1);
 }
-.nav-ig svg { width: 22px; height: 22px; }
+.nav-ig svg { width: 20px; height: 20px; }
 
 /* Hamburger */
 .hamburger {
