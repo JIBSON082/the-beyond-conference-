@@ -16,7 +16,7 @@ const TOTAL_BUDGET  = 2_400_000
 const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL'
 
 const LOGO_URL     = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
-const HERO_IMG     = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
+
 const INSTAGRAM_URL = 'https://www.instagram.com/the_beyond_community?igsh=eDVtdGpvM3B3bTF5'
 
 const ACCOUNT = {
