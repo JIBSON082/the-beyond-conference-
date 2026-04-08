@@ -164,7 +164,12 @@ ul { list-style: none; }
 
 .hero-section { position: relative; min-height: 100svh; display: flex; align-items: flex-end; overflow: hidden; }
 
-
+.hero-image-bg {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center center;
+  will-change: transform;
+}
 
 /* Very light overlay so image is bright and fully visible */
 .hero-overlay {
