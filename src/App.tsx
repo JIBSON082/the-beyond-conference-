@@ -82,25 +82,18 @@ async function sendToAppsScript(payload: Record<string, string | number>) {
 
 function IgIcon({ size = 18 }: { size?: number }) {
   return (
-    <svg
-      width={size} height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      {/* Outer rounded square — double border effect */}
-      <rect x="1.5" y="1.5" width="21" height="21" rx="6.5" ry="6.5"
-        stroke="currentColor" strokeWidth="1.2" opacity="0.35"/>
-      <rect x="3" y="3" width="18" height="18" rx="5" ry="5"
-        stroke="currentColor" strokeWidth="1.5"/>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      {/* Outer rounded square body */}
+      <rect x="3" y="3" width="18" height="18" rx="5.5" ry="5.5"
+        stroke="currentColor" strokeWidth="2" fill="none"/>
       {/* Lens circle */}
-      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5"/>
-      {/* Inner lens ring — subtle */}
-      <circle cx="12" cy="12" r="2.2" stroke="currentColor" strokeWidth="0.6" opacity="0.4"/>
+      <circle cx="12" cy="12" r="3.8"
+        stroke="currentColor" strokeWidth="2" fill="none"/>
+      {/* Inner lens ring */}
+      <circle cx="12" cy="12" r="1.6"
+        stroke="currentColor" strokeWidth="0.8" opacity="0.5" fill="none"/>
       {/* Flash dot */}
-      <circle cx="17" cy="7" r="1.4" fill="currentColor"/>
-      {/* Corner accent lines */}
-      <line x1="3" y1="8.5" x2="3" y2="3" stroke="currentColor" strokeWidth="0" opacity="0"/>
+      <circle cx="17" cy="7" r="1.3" fill="currentColor"/>
     </svg>
   )
 }
