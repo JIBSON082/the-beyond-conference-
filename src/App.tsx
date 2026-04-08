@@ -81,22 +81,26 @@ async function sendToAppsScript(payload: Record<string, string | number>) {
 // ============================================================
 
 function IgIcon({ size = 18 }: { size?: number }) {
-  const id = 'ig-grad'
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <defs>
-        <radialGradient id={id} cx="30%" cy="107%" r="150%">
-          <stop offset="0%"  stopColor="#fdf497"/>
-          <stop offset="15%" stopColor="#fda44b"/>
-          <stop offset="40%" stopColor="#f0587b"/>
-          <stop offset="65%" stopColor="#c53896"/>
-          <stop offset="100%" stopColor="#4e60d3"/>
-        </radialGradient>
-      </defs>
-      <rect x="2" y="2" width="20" height="20" rx="6" ry="6" fill={`url(#${id})`}/>
-      <rect x="2" y="2" width="20" height="20" rx="6" ry="6" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5"/>
-      <circle cx="12" cy="12" r="4.2" fill="none" stroke="white" strokeWidth="1.8"/>
-      <circle cx="17.4" cy="6.6" r="1.1" fill="white"/>
+    <svg
+      width={size} height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      {/* Outer rounded square — double border effect */}
+      <rect x="1.5" y="1.5" width="21" height="21" rx="6.5" ry="6.5"
+        stroke="currentColor" strokeWidth="1.2" opacity="0.35"/>
+      <rect x="3" y="3" width="18" height="18" rx="5" ry="5"
+        stroke="currentColor" strokeWidth="1.5"/>
+      {/* Lens circle */}
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5"/>
+      {/* Inner lens ring — subtle */}
+      <circle cx="12" cy="12" r="2.2" stroke="currentColor" strokeWidth="0.6" opacity="0.4"/>
+      {/* Flash dot */}
+      <circle cx="17" cy="7" r="1.4" fill="currentColor"/>
+      {/* Corner accent lines */}
+      <line x1="3" y1="8.5" x2="3" y2="3" stroke="currentColor" strokeWidth="0" opacity="0"/>
     </svg>
   )
 }
