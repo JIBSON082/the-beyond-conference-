@@ -256,7 +256,7 @@ function Navbar() {
             rel="noopener noreferrer"
             aria-label="Follow us on Instagram"
           >
-            <IgIcon size={20} />
+            <IgIcon size={18} />
           </a>
         </div>
 
