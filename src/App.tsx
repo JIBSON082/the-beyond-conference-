@@ -679,7 +679,6 @@ function Footer() {
           <p className="footer-tagline">There Is MORE.</p>
           <a href={INSTAGRAM_URL} className="footer-ig" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
             <IgIcon size={16} />
-            Instagram
           </a>
         </div>
         <div className="footer-links">
