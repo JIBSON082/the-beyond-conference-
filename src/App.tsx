@@ -1,22 +1,3 @@
-/**
- * THE BEYOND CONFERENCE 2026 — App.tsx
- *
- * ============================================================
- * GOOGLE APPS SCRIPT SETUP
- * ============================================================
- * 1. Go to https://script.google.com → New Project
- * 2. Paste the full contents of appscript.gs into the editor
- * 3. Fill in your SPREADSHEET_ID and RECIPIENT_EMAILS in the script
- * 4. Click Deploy → New Deployment → Web App
- *    - Execute as: Me
- *    - Who has access: Anyone
- * 5. Copy the Web App URL and paste it as APPS_SCRIPT_URL below
- *
- * UPDATE DONATION PROGRESS:
- * Change AMOUNT_RAISED below to reflect the current total raised.
- * ============================================================
- */
-
 import { useEffect, useRef, useState, useCallback } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -24,17 +5,18 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
 
 // ============================================================
-// CONFIGURATION
+// CONFIGURATION — EDIT THESE
 // ============================================================
 
-const AMOUNT_RAISED = 0 // Update this value (in Naira) as donations arrive
+/** Update this value (in Naira) as donations arrive */
+const AMOUNT_RAISED = 0
+const TOTAL_BUDGET  = 2_400_000
 
-const TOTAL_BUDGET = 2_400_000
-
+/** Paste your deployed Google Apps Script Web App URL here */
 const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL'
 
-const LOGO_URL = 'https://image2url.com/r2/default/images/1775526751389-21009a87-43a1-4cae-9afa-4ac23128ac50.jpg'
-const HERO_IMG = 'https://image2url.com/r2/default/images/1775559218217-257adcce-d9db-4691-9ec1-f9cd3eb1bb2d.jpg'
+const LOGO_URL     = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
+const HERO_IMG     = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
 const INSTAGRAM_URL = 'https://www.instagram.com/the_beyond_community?igsh=eDVtdGpvM3B3bTF5'
 
 const ACCOUNT = {
@@ -73,7 +55,7 @@ const UNITS = [
 
 const formatNaira = (n: number) => '₦' + n.toLocaleString('en-NG')
 
-const incrementCount = (unit: string): { newCount: number; allStats: Record<string, number>; total: number } => {
+const incrementCount = (unit: string) => {
   try {
     const all = JSON.parse(localStorage.getItem('beyond_counts') || '{}')
     all[unit] = (all[unit] || 0) + 1
@@ -85,21 +67,119 @@ const incrementCount = (unit: string): { newCount: number; allStats: Record<stri
   }
 }
 
-// ============================================================
-// GOOGLE APPS SCRIPT SUBMIT
-// ============================================================
-
 async function sendToAppsScript(payload: Record<string, string | number>) {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') return
   try {
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify(payload),
-    })
+    await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
   } catch (e) {
-    console.warn('Apps Script submission failed — recorded locally only.', e)
+    console.warn('Apps Script submission — check configuration.', e)
   }
+}
+
+// ============================================================
+// INSTAGRAM SVG ICON
+// ============================================================
+
+function IgIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      width={size} height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+    </svg>
+  )
+}
+
+// ============================================================
+// ANIMATED GLOBE O
+// The O in "BEYOND" rendered as a rotating SVG globe
+// ============================================================
+
+function GlobeO() {
+  const globeRef = useRef<SVGSVGElement>(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Meridian lines spin — scaleX creates the 3-D longitude illusion
+      gsap.to('#meridian-group', {
+        scaleX:   -1,
+        duration: 2.5,
+        ease:     'sine.inOut',
+        repeat:   -1,
+        yoyo:     true,
+        transformOrigin: 'center center',
+      })
+      // Subtle continuous rotation of the whole globe
+      gsap.to(globeRef.current, {
+        rotation: 360,
+        duration: 18,
+        ease:     'none',
+        repeat:   -1,
+        transformOrigin: 'center center',
+      })
+      // Perpetual glow pulse
+      gsap.to('#globe-glow', {
+        opacity: 0.6,
+        scale:   1.12,
+        duration: 2,
+        ease:    'sine.inOut',
+        repeat:  -1,
+        yoyo:    true,
+        transformOrigin: 'center center',
+      })
+    }, globeRef)
+    return () => ctx.revert()
+  }, [])
+
+  // SVG viewBox is 0 0 100 100, representing the letter O as a globe
+  return (
+    <span className="globe-o-wrap" aria-hidden="true">
+      <svg
+        ref={globeRef}
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ overflow: 'visible' }}
+      >
+        {/* Glow */}
+        <circle id="globe-glow" cx="50" cy="50" r="46" fill="rgba(212,168,42,0.08)" />
+
+        {/* Outer ring — the O shape */}
+        <circle cx="50" cy="50" r="44" fill="none" stroke="white" strokeWidth="5" />
+
+        {/* Latitude lines (static) */}
+        <g stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none">
+          {/* Equator */}
+          <ellipse cx="50" cy="50" rx="44" ry="12" />
+          {/* Upper latitude */}
+          <ellipse cx="50" cy="30" rx="36" ry="9" />
+          {/* Lower latitude */}
+          <ellipse cx="50" cy="70" rx="36" ry="9" />
+        </g>
+
+        {/* Meridian lines — these get scaleX toggled for spin illusion */}
+        <g id="meridian-group" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" fill="none">
+          {/* Centre meridian — full ellipse */}
+          <ellipse cx="50" cy="50" rx="3"  ry="44" />
+          {/* Left meridian */}
+          <ellipse cx="50" cy="50" rx="28" ry="44" />
+          {/* Right meridian */}
+          <ellipse cx="50" cy="50" rx="28" ry="44" transform="rotate(60,50,50)" />
+        </g>
+
+        {/* Gold highlight dot — like a star on the globe */}
+        <circle cx="64" cy="34" r="3.5" fill="var(--gold-light)" opacity="0.85" />
+      </svg>
+    </span>
+  )
 }
 
 // ============================================================
@@ -110,11 +190,8 @@ function Loader({ onDone }: { onDone: () => void }) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     setTimeout(() => {
-      gsap.to(ref.current, {
-        opacity: 0, duration: 0.7, delay: 0.5,
-        onComplete: onDone,
-      })
-    }, 900)
+      gsap.to(ref.current, { opacity: 0, duration: 0.7, onComplete: onDone })
+    }, 1000)
   }, [onDone])
   return (
     <div ref={ref} className="loader-screen">
@@ -168,23 +245,26 @@ function Navbar() {
   return (
     <>
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-        <button className="nav-logo" onClick={() => navigate('#home')} aria-label="Back to top">
-          <img src={LOGO_URL} alt="The Beyond Conference" />
-        </button>
-        <a
-          href={INSTAGRAM_URL}
-          className="nav-instagram"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Instagram"
-        >
-          Instagram
-        </a>
+        {/* Logo + Instagram icon grouped together */}
+        <div className="nav-left">
+          <button className="nav-logo" onClick={() => navigate('#home')} aria-label="Home">
+            <img src={LOGO_URL} alt="The Beyond Conference" />
+          </button>
+          <a
+            href={INSTAGRAM_URL}
+            className="nav-ig"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Follow us on Instagram"
+          >
+            <IgIcon size={18} />
+          </a>
+        </div>
+
         <button
           className={`hamburger ${open ? 'active' : ''}`}
           onClick={() => setOpen(v => !v)}
           aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
         >
           <span /><span /><span />
         </button>
@@ -204,74 +284,6 @@ function Navbar() {
 }
 
 // ============================================================
-// GLOBE STAGE — orbital rings + particles
-// ============================================================
-
-function GlobeStage() {
-  const stageRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const isMobile = window.innerWidth < 768
-      const particleCount = isMobile ? 14 : 26
-
-      // Create particles
-      const container = stageRef.current?.querySelector('.globe-particles')
-      if (container) {
-        for (let i = 0; i < particleCount; i++) {
-          const dot = document.createElement('div')
-          dot.className = 'particle-dot'
-          const angle  = (i / particleCount) * Math.PI * 2
-          const radius = 38 + Math.random() * 46
-          dot.style.left = `${50 + Math.cos(angle) * radius}%`
-          dot.style.top  = `${50 + Math.sin(angle) * radius}%`
-          dot.style.opacity = '0'
-          container.appendChild(dot)
-
-          gsap.to(dot, {
-            opacity:  Math.random() * 0.85 + 0.15,
-            scale:    Math.random() * 2.5 + 0.4,
-            x:        (Math.random() - 0.5) * 28,
-            y:        (Math.random() - 0.5) * 28,
-            duration: 2.5 + Math.random() * 3,
-            repeat:   -1,
-            yoyo:     true,
-            ease:     'sine.inOut',
-            delay:    Math.random() * 2.5,
-          })
-        }
-      }
-
-      // Set ring initial tilt positions
-      gsap.set('#ring1', { rotationX: 68 })
-      gsap.set('#ring2', { rotationX: 40, rotationZ: 55 })
-      gsap.set('#ring3', { rotationX: 20, rotationZ: -35 })
-      gsap.set('#ring4', { rotationX: 82, rotationZ: 20 })
-
-      // Continuous rotation — all GPU-only transforms
-      gsap.to('#ring1', { rotation: 360,  duration: 14, repeat: -1, ease: 'none' })
-      gsap.to('#ring2', { rotation: -360, duration: 21, repeat: -1, ease: 'none' })
-      gsap.to('#ring3', { rotation: 360,  duration: 30, repeat: -1, ease: 'none' })
-      gsap.to('#ring4', { rotation: -360, duration: 40, repeat: -1, ease: 'none' })
-
-    }, stageRef)
-    return () => ctx.revert()
-  }, [])
-
-  return (
-    <div ref={stageRef} className="globe-stage" id="globeStage" aria-hidden="true">
-      <div className="globe-glow-outer" />
-      <div className="globe-glow-inner" />
-      <div className="ring ring-1" id="ring1" />
-      <div className="ring ring-2" id="ring2" />
-      <div className="ring ring-3" id="ring3" />
-      <div className="ring ring-4" id="ring4" />
-      <div className="globe-particles" />
-    </div>
-  )
-}
-
-// ============================================================
 // HERO
 // ============================================================
 
@@ -281,67 +293,55 @@ function HeroSection() {
   const eyebrowRef = useRef<HTMLDivElement>(null)
   const titleRef   = useRef<HTMLHeadingElement>(null)
   const detailsRef = useRef<HTMLDivElement>(null)
-  const stageRef   = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ delay: 0.3 })
-
-      // Image cinematic entrance
       tl.fromTo(imgRef.current,
-        { scale: 1.15, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 2.4, ease: 'power2.out' }
+        { scale: 1.06, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 2.0, ease: 'power2.out' }
       )
-      // Globe stage fades in
-      .fromTo(stageRef.current,
-        { opacity: 0, scale: 0.88 },
-        { opacity: 1, scale: 1, duration: 1.8, ease: 'power3.out' },
-        '-=2.0'
-      )
-      // Text reveals
       .fromTo(eyebrowRef.current,
         { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, ease: 'power3.out' },
-        '-=1.3'
+        { y: 0, opacity: 1, duration: 1, ease: 'power3.out' }, '-=1.4'
       )
       .fromTo(titleRef.current,
-        { y: 100, opacity: 0, skewY: 4 },
-        { y: 0, opacity: 1, skewY: 0, duration: 1.4, ease: 'power3.out' },
-        '-=0.8'
+        { y: 90, opacity: 0, skewY: 3 },
+        { y: 0, opacity: 1, skewY: 0, duration: 1.3, ease: 'power3.out' }, '-=0.8'
       )
-      .fromTo(detailsRef.current ? Array.from(detailsRef.current.children) : [],
+      .fromTo(
+        detailsRef.current ? Array.from(detailsRef.current.children) : [],
         { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.1, duration: 0.9, ease: 'power3.out' },
-        '-=0.8'
+        { y: 0, opacity: 1, stagger: 0.1, duration: 0.9, ease: 'power3.out' }, '-=0.8'
       )
 
-      // Parallax scroll on image
+      // Subtle parallax
       gsap.to(imgRef.current, {
-        yPercent: 22, ease: 'none',
+        yPercent: 14, ease: 'none',
         scrollTrigger: { trigger: heroRef.current, start: 'top top', end: 'bottom top', scrub: 1 },
       })
-
-      // Globe stage gentle float
-      gsap.to(stageRef.current, {
-        y: -18, duration: 4, ease: 'sine.inOut', repeat: -1, yoyo: true,
-      })
-
     }, heroRef)
     return () => ctx.revert()
   }, [])
 
   return (
     <section id="home" ref={heroRef} className="hero-section">
-      <div ref={imgRef} className="hero-image-bg" style={{ backgroundImage: `url('${HERO_IMG}')` }} aria-hidden="true" />
-      <div ref={stageRef}><GlobeStage /></div>
+      <div
+        ref={imgRef}
+        className="hero-image-bg"
+        style={{ backgroundImage: `url('${HERO_IMG}')` }}
+        aria-hidden="true"
+      />
       <div className="hero-overlay" aria-hidden="true" />
 
       <div className="hero-content">
         <div ref={eyebrowRef} className="hero-eyebrow">Theme: MORE</div>
+
         <h1 ref={titleRef} className="hero-title">
-          THE BEYOND<br />CONFERENCE
+          THE BEY<GlobeO />ND<br />CONFERENCE
           <span className="hero-year">2026</span>
         </h1>
+
         <div ref={detailsRef} className="hero-details">
           <div className="hero-detail-item">
             <span className="detail-label">Date</span>
@@ -388,16 +388,15 @@ function VisionSection() {
   const ref = useRef<HTMLElement>(null)
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const st = (trigger: string) => ({ scrollTrigger: { trigger, start: 'top 82%' } })
-      gsap.fromTo('.v-label',  { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.v-label') })
-      gsap.fromTo('.v-head',   { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.v-head') })
-      gsap.fromTo('.v-intro p',{ y:35,opacity:0 }, { y:0,opacity:1,stagger:0.2,duration:1, ...st('.v-intro') })
+      const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 82%' } })
+      gsap.fromTo('.v-label',    { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.v-label') })
+      gsap.fromTo('.v-head',     { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.v-head') })
+      gsap.fromTo('.v-intro p',  { y:35,opacity:0 }, { y:0,opacity:1,stagger:0.2,duration:1, ...st('.v-intro') })
       gsap.fromTo('.vision-pillar', { y:60,opacity:0,scale:0.97 }, { y:0,opacity:1,scale:1,stagger:0.12,duration:1,ease:'power3.out', scrollTrigger:{ trigger:'.vision-pillars',start:'top 78%' } })
-      gsap.fromTo('.v-closing',{ y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.v-closing') })
+      gsap.fromTo('.v-closing',  { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.v-closing') })
     }, ref)
     return () => ctx.revert()
   }, [])
-
   return (
     <section id="vision" ref={ref} className="vision-section">
       <div className="section-container">
@@ -433,13 +432,11 @@ function PartnershipsSection() {
   const ref     = useRef<HTMLElement>(null)
   const fillRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState<string | null>(null)
-
   const pct = Math.min((AMOUNT_RAISED / TOTAL_BUDGET) * 100, 100)
 
   const copy = (val: string, label: string) => {
     navigator.clipboard.writeText(val).then(() => {
-      setCopied(label)
-      setTimeout(() => setCopied(null), 2200)
+      setCopied(label); setTimeout(() => setCopied(null), 2200)
     })
   }
 
@@ -539,19 +536,14 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
 
   const submit = async () => {
     if (!form.name || !form.phone || !form.email || !form.attending || !form.mode) {
-      alert('Please complete all fields before confirming.')
-      return
+      alert('Please complete all fields before confirming.'); return
     }
     setStatus('sending')
-
     const { newCount, allStats, total } = incrementCount(unit)
     const now = new Date().toLocaleString('en-NG', { timeZone:'Africa/Lagos', dateStyle:'long', timeStyle:'short' })
-
     await sendToAppsScript({
       name: form.name, phone: form.phone, email: form.email,
-      unit, attending: form.attending, mode: form.mode,
-      timestamp: now,
-      // Per-unit counts for Apps Script email
+      unit, attending: form.attending, mode: form.mode, timestamp: now,
       totalAll: total,
       countRegistration: allStats['Registration Unit'] || 0,
       countMedia:        allStats['Media Unit']        || 0,
@@ -561,12 +553,8 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
       countLogistics:    allStats['Logistics Unit']    || 0,
       countWelfare:      allStats['Welfare Unit']      || 0,
     })
-
     setStatus('success')
-    setTimeout(() => {
-      window.open(WHATSAPP[unit], '_blank', 'noopener,noreferrer')
-      close()
-    }, 2600)
+    setTimeout(() => { window.open(WHATSAPP[unit], '_blank', 'noopener,noreferrer'); close() }, 2600)
   }
 
   return (
@@ -577,12 +565,11 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
           <p className="modal-unit-label">Joining</p>
           <h3 className="modal-title">{unit}</h3>
         </div>
-
         {status === 'success' ? (
           <div className="modal-success">
             <div className="success-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <polyline points="20 6 9 17 4 12" />
+                <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
             <p>Welcome to the {unit}.</p>
@@ -592,15 +579,15 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
           <div className="modal-form">
             <div className="form-field">
               <label htmlFor="vol-name">Full Name</label>
-              <input id="vol-name" type="text" placeholder="Enter your full name" value={form.name} onChange={e => setField('name', e.target.value)} autoComplete="name" />
+              <input id="vol-name" type="text" placeholder="Enter your full name" value={form.name} onChange={e => setField('name', e.target.value)} autoComplete="name"/>
             </div>
             <div className="form-field">
               <label htmlFor="vol-phone">Phone Number</label>
-              <input id="vol-phone" type="tel" placeholder="e.g. 08012345678" value={form.phone} onChange={e => setField('phone', e.target.value)} autoComplete="tel" />
+              <input id="vol-phone" type="tel" placeholder="e.g. 08012345678" value={form.phone} onChange={e => setField('phone', e.target.value)} autoComplete="tel"/>
             </div>
             <div className="form-field">
               <label htmlFor="vol-email">Email Address</label>
-              <input id="vol-email" type="email" placeholder="your@email.com" value={form.email} onChange={e => setField('email', e.target.value)} autoComplete="email" />
+              <input id="vol-email" type="email" placeholder="your@email.com" value={form.email} onChange={e => setField('email', e.target.value)} autoComplete="email"/>
             </div>
             <div className="form-row">
               <div className="form-field">
@@ -608,7 +595,7 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
                 <div className="radio-group">
                   {(['Yes','No'] as const).map(opt => (
                     <label key={opt} className={`radio-option ${form.attending === opt ? 'selected' : ''}`}>
-                      <input type="radio" name="attending" value={opt} checked={form.attending === opt} onChange={() => setField('attending', opt)} />
+                      <input type="radio" name="attending" value={opt} checked={form.attending === opt} onChange={() => setField('attending', opt)}/>
                       {opt}
                     </label>
                   ))}
@@ -619,7 +606,7 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
                 <div className="radio-group">
                   {(['Virtual','Physical'] as const).map(opt => (
                     <label key={opt} className={`radio-option ${form.mode === opt ? 'selected' : ''}`}>
-                      <input type="radio" name="mode" value={opt} checked={form.mode === opt} onChange={() => setField('mode', opt)} />
+                      <input type="radio" name="mode" value={opt} checked={form.mode === opt} onChange={() => setField('mode', opt)}/>
                       {opt}
                     </label>
                   ))}
@@ -644,7 +631,6 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
 function VolunteersSection() {
   const ref           = useRef<HTMLElement>(null)
   const [active, setActive] = useState<string | null>(null)
-
   useEffect(() => {
     const ctx = gsap.context(() => {
       const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 85%' } })
@@ -655,7 +641,6 @@ function VolunteersSection() {
     }, ref)
     return () => ctx.revert()
   }, [])
-
   return (
     <section id="volunteers" ref={ref} className="volunteers-section">
       <div className="section-container">
@@ -685,7 +670,6 @@ function VolunteersSection() {
 function Footer() {
   const scrollTo = (href: string) =>
     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
-
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -693,7 +677,8 @@ function Footer() {
           <img src={LOGO_URL} alt="The Beyond Conference" className="footer-logo" />
           <p>The Beyond Conference 2026</p>
           <p className="footer-tagline">There Is MORE.</p>
-          <a href={INSTAGRAM_URL} className="footer-instagram" target="_blank" rel="noopener noreferrer">
+          <a href={INSTAGRAM_URL} className="footer-ig" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <IgIcon size={16} />
             Instagram
           </a>
         </div>
@@ -729,7 +714,6 @@ function Footer() {
 
 export default function App() {
   const [loaded, setLoaded] = useState(false)
-
   return (
     <>
       {!loaded && <Loader onDone={() => setLoaded(true)} />}
