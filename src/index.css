@@ -166,8 +166,7 @@ ul { list-style: none; }
 
 .hero-image-bg {
   position: absolute; inset: 0;
-  background-size: cover;
-  background-position: center center;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, #1a2d5a 0%, #0a1428 55%, #070e1e 100%);
   will-change: transform;
 }
 
