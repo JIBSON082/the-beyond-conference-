@@ -80,7 +80,7 @@ async function sendToAppsScript(payload: Record<string, string | number>) {
 // INSTAGRAM SVG ICON
 // ============================================================
 
-function IgIcon({ size = 18 }: { size?: number }) {
+function IgIcon({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
       {/* Outer rounded square body */}
