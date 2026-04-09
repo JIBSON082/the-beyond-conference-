@@ -100,45 +100,57 @@ function IgIcon({ size = 16 }: { size?: number }) {
 // ============================================================
 
 function GlobeO() {
-  const globeRef = useRef<SVGSVGElement>(null)
+  const globeRef = useRef<HTMLImageElement>(null);
+  const glowRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to('#meridian-group', {
-        scaleX: -1, duration: 2.5, ease: 'sine.inOut',
-        repeat: -1, yoyo: true, transformOrigin: 'center center',
-      })
+      // Slower, more majestic rotation for the globe
       gsap.to(globeRef.current, {
-        rotation: 360, duration: 18, ease: 'none',
-        repeat: -1, transformOrigin: 'center center',
-      })
-      gsap.to('#globe-glow', {
-        opacity: 0.6, scale: 1.12, duration: 2, ease: 'sine.inOut',
-        repeat: -1, yoyo: true, transformOrigin: 'center center',
-      })
-    }, globeRef)
-    return () => ctx.revert()
-  }, [])
+        rotation: 360,
+        duration: 40,
+        ease: 'none',
+        repeat: -1,
+        transformOrigin: 'center center',
+      });
+
+      // Subtle pulsing effect for the outer glow
+      gsap.to(glowRef.current, {
+        opacity: 0.8,
+        scale: 1.15,
+        duration: 3,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+      });
+    }, globeRef);
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <span className="globe-o-wrap" aria-hidden="true">
-      <svg ref={globeRef} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ overflow: 'visible' }}>
-        <circle id="globe-glow" cx="50" cy="50" r="46" fill="rgba(212,168,42,0.08)" />
-        <circle cx="50" cy="50" r="44" fill="none" stroke="white" strokeWidth="5" />
-        <g stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none">
-          <ellipse cx="50" cy="50" rx="44" ry="12" />
-          <ellipse cx="50" cy="30" rx="36" ry="9" />
-          <ellipse cx="50" cy="70" rx="36" ry="9" />
-        </g>
-        <g id="meridian-group" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" fill="none">
-          <ellipse cx="50" cy="50" rx="3"  ry="44" />
-          <ellipse cx="50" cy="50" rx="28" ry="44" />
-          <ellipse cx="50" cy="50" rx="28" ry="44" transform="rotate(60,50,50)" />
-        </g>
-        <circle cx="64" cy="34" r="3.5" fill="var(--gold-light)" opacity="0.85" />
-      </svg>
+    <span 
+      className="inline-block relative mx-[6px]" 
+      style={{ 
+        width: '0.78em', 
+        height: '0.78em', 
+        transform: 'translateY(0.06em)' 
+      }} 
+      aria-hidden="true"
+    >
+      {/* Dynamic outer glow complementing the golden/blue hues of the image */}
+      <span 
+        ref={glowRef} 
+        className="absolute inset-0 rounded-full bg-brand-gold/30 blur-md mix-blend-screen pointer-events-none opacity-50"
+      ></span>
+      
+      <img
+        ref={globeRef}
+        src="https://image2url.com/r2/default/images/1775735181650-a7f96510-90e2-44e4-b3b7-b413e64c75aa.jpg"
+        alt="Realistic Globe"
+        className="relative z-10 w-full h-full object-cover rounded-full shadow-[0_0_20px_rgba(212,168,42,0.3)]"
+      />
     </span>
-  )
+  );
 }
 
 // ============================================================
@@ -475,218 +487,4 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
     setForm(f => ({ ...f, [k]: v }))
 
   const submit = async () => {
-    if (!form.name || !form.phone || !form.email || !form.attending || !form.mode) {
-      setErrMsg('Please complete all fields before confirming.')
-      return
-    }
-    setErrMsg('')
-    setStatus('sending')
-
-    const { allStats, total } = incrementCount(unit)
-    const now = new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos', dateStyle: 'long', timeStyle: 'short' })
-
-    const params = new URLSearchParams({
-      name:              form.name.trim(),
-      phone:             form.phone.trim(),
-      email:             form.email.trim(),
-      unit,
-      attending:         form.attending,
-      mode:              form.mode,
-      timestamp:         now,
-      totalAll:          String(total),
-      countRegistration: String(allStats['Registration Unit'] || 0),
-      countMedia:        String(allStats['Media Unit']        || 0),
-      countUshering:     String(allStats['Ushering Unit']     || 0),
-      countProtocol:     String(allStats['Protocol Unit']     || 0),
-      countSponsorship:  String(allStats['Sponsorship Unit']  || 0),
-      countLogistics:    String(allStats['Logistics Unit']    || 0),
-      countWelfare:      String(allStats['Welfare Unit']      || 0),
-    })
-
-    // Fire email in background — don't await it
-    fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
-      method: 'GET',
-      mode:   'no-cors',
-    })
-
-    // Navigate directly to WhatsApp — no delay, no popup
-    window.location.href = WHATSAPP[unit]
-  }
-
-  return (
-    <div className="modal-backdrop" onClick={close}>
-      <div ref={ref} className="modal" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={close}>Close</button>
-        <div className="modal-header">
-          <p className="modal-unit-label">Joining</p>
-          <h3 className="modal-title">{unit}</h3>
-        </div>
-        {status === 'success' ? (
-          <div className="modal-success">
-            <div className="success-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-            </div>
-            <p>Welcome to the {unit}.</p>
-            <p className="redirect-note">Taking you to the group chat now...</p>
-          </div>
-        ) : (
-          <div className="modal-form">
-            <div className="form-field">
-              <label htmlFor="vol-name">Full Name</label>
-              <input id="vol-name" type="text" placeholder="Enter your full name" value={form.name} onChange={e => setField('name', e.target.value)} autoComplete="name"/>
-            </div>
-            <div className="form-field">
-              <label htmlFor="vol-phone">Phone Number</label>
-              <input id="vol-phone" type="tel" placeholder="e.g. 08012345678" value={form.phone} onChange={e => setField('phone', e.target.value)} autoComplete="tel"/>
-            </div>
-            <div className="form-field">
-              <label htmlFor="vol-email">Email Address</label>
-              <input id="vol-email" type="email" placeholder="your@email.com" value={form.email} onChange={e => setField('email', e.target.value)} autoComplete="email"/>
-            </div>
-            <div className="form-row">
-              <div className="form-field">
-                <label>Will you be attending?</label>
-                <div className="radio-group">
-                  {(['Yes','No'] as const).map(opt => (
-                    <label key={opt} className={`radio-option ${form.attending === opt ? 'selected' : ''}`}>
-                      <input type="radio" name="attending" value={opt} checked={form.attending === opt} onChange={() => setField('attending', opt)}/>
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div className="form-field">
-                <label>Participation Mode</label>
-                <div className="radio-group">
-                  {(['Virtual','Physical'] as const).map(opt => (
-                    <label key={opt} className={`radio-option ${form.mode === opt ? 'selected' : ''}`}>
-                      <input type="radio" name="mode" value={opt} checked={form.mode === opt} onChange={() => setField('mode', opt)}/>
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-            {errMsg && <p className="error-msg">{errMsg}</p>}
-            <button className="confirm-btn" onClick={submit} disabled={status === 'sending'}>
-              {status === 'sending' ? 'Submitting...' : 'Confirm Registration'}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ============================================================
-// VOLUNTEERS
-// ============================================================
-
-function VolunteersSection() {
-  const ref                     = useRef<HTMLElement>(null)
-  const [active, setActive]     = useState<string | null>(null)
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 85%' } })
-      gsap.fromTo('.vol-label', { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.vol-label') })
-      gsap.fromTo('.vol-head',  { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.vol-head') })
-      gsap.fromTo('.vol-intro', { y:30,opacity:0 }, { y:0,opacity:1,duration:0.9, ...st('.vol-intro') })
-      gsap.fromTo('.unit-card', { y:65,opacity:0 }, { y:0,opacity:1,stagger:0.1,duration:1,ease:'power3.out', scrollTrigger:{ trigger:'.units-grid',start:'top 78%' } })
-    }, ref)
-    return () => ctx.revert()
-  }, [])
-
-  return (
-    <section id="volunteers" ref={ref} className="volunteers-section">
-      <div className="section-container">
-        <div className="section-label vol-label">03 — Join the Team</div>
-        <h2 className="section-heading vol-head">Call for<br /><em>Volunteers</em></h2>
-        <p className="volunteers-intro vol-intro">The Beyond Conference 2026 is powered by a team of committed, passionate individuals. Choose a unit that resonates with you, complete the form, and become part of something greater than yourself.</p>
-        <div className="units-grid">
-          {UNITS.map((unit, i) => (
-            <article key={unit.name} className="unit-card">
-              <div className="unit-number" aria-hidden="true">0{i + 1}</div>
-              <h3 className="unit-name">{unit.name}</h3>
-              <p className="unit-desc">{unit.desc}</p>
-              <button className="join-btn" onClick={() => setActive(unit.name)}>Join Unit</button>
-            </article>
-          ))}
-        </div>
-      </div>
-      {active && <VolunteerModal unit={active} onClose={() => setActive(null)} />}
-    </section>
-  )
-}
-
-// ============================================================
-// FOOTER
-// ============================================================
-
-function Footer() {
-  const scrollTo = (href: string) =>
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
-  return (
-    <footer className="footer">
-      <div className="footer-container">
-        <div className="footer-brand">
-          <img src={LOGO_URL} alt="The Beyond Conference" className="footer-logo" />
-          <p>The Beyond Conference 2026</p>
-          <p className="footer-tagline">There Is MORE.</p>
-          <a href={INSTAGRAM_URL} className="footer-ig" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-            <IgIcon size={16} />
-          </a>
-        </div>
-        <div className="footer-links">
-          <h4>Quick Links</h4>
-          <ul>
-            {NAV_SECTIONS.map(s => (
-              <li key={s.href}>
-                <a href={s.href} onClick={e => { e.preventDefault(); scrollTo(s.href) }}>{s.label}</a>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="footer-event">
-          <h4>Event Details</h4>
-          <p>30th May, 2026</p>
-          <p>College of Medicine</p>
-          <p>Lagos University Teaching Hospital</p>
-          <p>Idi-Araba, Lagos</p>
-        </div>
-      </div>
-      <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} The Beyond Conference. All rights reserved.</p>
-        <p>Convened by Bookola</p>
-      </div>
-    </footer>
-  )
-}
-
-// ============================================================
-// ROOT APP
-// ============================================================
-
-export default function App() {
-  const [loaded, setLoaded] = useState(false)
-  return (
-    <>
-      {!loaded && <Loader onDone={() => setLoaded(true)} />}
-      <div style={{ visibility: loaded ? 'visible' : 'hidden' }}>
-        <Navbar />
-        <main>
-          <HeroSection />
-          <div className="gold-line" />
-          <VisionSection />
-          <div className="gold-line" />
-          <PartnershipsSection />
-          <div className="gold-line" />
-          <VolunteersSection />
-        </main>
-        <Footer />
-      </div>
-    </>
-  )
-}
+    if (!
