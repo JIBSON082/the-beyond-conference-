@@ -100,45 +100,57 @@ function IgIcon({ size = 16 }: { size?: number }) {
 // ============================================================
 
 function GlobeO() {
-  const globeRef = useRef<SVGSVGElement>(null)
+  const globeRef = useRef<HTMLImageElement>(null);
+  const glowRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to('#meridian-group', {
-        scaleX: -1, duration: 2.5, ease: 'sine.inOut',
-        repeat: -1, yoyo: true, transformOrigin: 'center center',
-      })
+      // Slower, more majestic rotation for the globe
       gsap.to(globeRef.current, {
-        rotation: 360, duration: 18, ease: 'none',
-        repeat: -1, transformOrigin: 'center center',
-      })
-      gsap.to('#globe-glow', {
-        opacity: 0.6, scale: 1.12, duration: 2, ease: 'sine.inOut',
-        repeat: -1, yoyo: true, transformOrigin: 'center center',
-      })
-    }, globeRef)
-    return () => ctx.revert()
-  }, [])
+        rotation: 360,
+        duration: 40,
+        ease: 'none',
+        repeat: -1,
+        transformOrigin: 'center center',
+      });
+
+      // Subtle pulsing effect for the outer glow
+      gsap.to(glowRef.current, {
+        opacity: 0.8,
+        scale: 1.15,
+        duration: 3,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+      });
+    }, globeRef);
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <span className="globe-o-wrap" aria-hidden="true">
-      <svg ref={globeRef} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ overflow: 'visible' }}>
-        <circle id="globe-glow" cx="50" cy="50" r="46" fill="rgba(212,168,42,0.08)" />
-        <circle cx="50" cy="50" r="44" fill="none" stroke="white" strokeWidth="5" />
-        <g stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none">
-          <ellipse cx="50" cy="50" rx="44" ry="12" />
-          <ellipse cx="50" cy="30" rx="36" ry="9" />
-          <ellipse cx="50" cy="70" rx="36" ry="9" />
-        </g>
-        <g id="meridian-group" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" fill="none">
-          <ellipse cx="50" cy="50" rx="3"  ry="44" />
-          <ellipse cx="50" cy="50" rx="28" ry="44" />
-          <ellipse cx="50" cy="50" rx="28" ry="44" transform="rotate(60,50,50)" />
-        </g>
-        <circle cx="64" cy="34" r="3.5" fill="var(--gold-light)" opacity="0.85" />
-      </svg>
+    <span 
+      className="inline-block relative mx-[6px]" 
+      style={{ 
+        width: '0.78em', 
+        height: '0.78em', 
+        transform: 'translateY(0.06em)' 
+      }} 
+      aria-hidden="true"
+    >
+      {/* Dynamic outer glow complementing the golden/blue hues of the image */}
+      <span 
+        ref={glowRef} 
+        className="absolute inset-0 rounded-full bg-brand-gold/30 blur-md mix-blend-screen pointer-events-none opacity-50"
+      ></span>
+      
+      <img
+        ref={globeRef}
+        src="https://image2url.com/r2/default/images/1775735181650-a7f96510-90e2-44e4-b3b7-b413e64c75aa.jpg"
+        alt="Realistic Globe"
+        className="relative z-10 w-full h-full object-cover rounded-full shadow-[0_0_20px_rgba(212,168,42,0.3)]"
+      />
     </span>
-  )
+  );
 }
 
 // ============================================================
