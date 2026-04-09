@@ -509,7 +509,7 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
     })
 
     // Open WhatsApp immediately, no waiting
-    window.open(WHATSAPP[unit], '_blank', 'noopener,noreferrer')
+    window.location.href = WHATSAPP[unit]
     close()
 
   return (
