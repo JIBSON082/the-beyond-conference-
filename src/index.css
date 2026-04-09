@@ -220,8 +220,8 @@ ul { list-style: none; }
 
 .globe-o-img {
   display: inline-block;
-  width: 0.88em;
-  height: 0.88em;
+  width: 0.72em;
+  height: 0.72em;
   object-fit: cover;
   border-radius: 50%;
   position: relative;
