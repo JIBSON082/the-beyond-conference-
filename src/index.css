@@ -253,11 +253,12 @@ ul { list-style: none; }
 
 /* ---- Hero title word masks ---- */
 .hero-title-mask {
-  display: inline;
-  overflow: visible;
+  display: block;
+  overflow: hidden;
+  line-height: 0.97;
 }
 .hero-title-word {
-  display: inline;
+  display: block;
   will-change: transform;
 }
 
