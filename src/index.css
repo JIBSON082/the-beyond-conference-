@@ -231,8 +231,6 @@ ul { list-style: none; }
   border: none;
   outline: none;
   filter: brightness(1.4) contrast(1.05);
-  transform: scale(1.09);
-  overflow: visible;
   box-shadow: 0 0 12px rgba(212,168,42,0.2), 0 0 30px rgba(212,168,42,0.08);
 }
 .globe-o-glow {
