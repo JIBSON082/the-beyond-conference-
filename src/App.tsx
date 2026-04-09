@@ -17,7 +17,7 @@ const LOGO_URL      = 'https://image2url.com/r2/default/images/1775682194312-829
 const HERO_IMG      = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
 const INSTAGRAM_URL = 'https://www.instagram.com/the_beyond_community?igsh=eDVtdGpvM3B3bTF5'
 
-const GLOBE_IMG = 'https://image2url.com/r2/default/images/1775526751389-21009a87-43a1-4cae-9afa-4ac23128ac50.jpg'
+const GLOBE_IMG = '<img src="https://image2url.com/r2/default/images/1775746610770-89cc6a47-c9d1-44a0-b5df-edac93cdc94c.jpg" alt="image" />'
 
 const ACCOUNT = {
   number: '7350104678',
