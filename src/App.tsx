@@ -442,13 +442,13 @@ function HeroSection() {
         </div>
 
         <h1 className="hero-title">
-  <div ref={word1Ref} style={{ overflow:'hidden' }}>
+  <div ref={word1Ref} style={{ overflow:'visible' }}>
     <span style={{ display:'block' }}>THE</span>
   </div>
-  <div ref={word2Ref} style={{ overflow:'hidden' }}>
+  <div ref={word2Ref} style={{ overflow:'visible' }}>
     <span style={{ display:'block' }}>BEY<GlobeO />ND</span>
   </div>
-  <div ref={word3Ref} style={{ overflow:'hidden' }}>
+  <div ref={word3Ref} style={{ overflow:'visible' }}>
     <span style={{ display:'block' }}>CONFERENCE</span>
   </div>
   <span ref={yearRef} className="hero-year">2026</span>
