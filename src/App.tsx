@@ -503,14 +503,15 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
       countWelfare:      String(allStats['Welfare Unit']      || 0),
     })
 
+    // Fire email in background — don't await it
     fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
       method: 'GET',
       mode:   'no-cors',
     })
 
-    // Open WhatsApp immediately, no waiting
+    // Navigate directly to WhatsApp — no delay, no popup
     window.location.href = WHATSAPP[unit]
-    close()
+  }
 
   return (
     <div className="modal-backdrop" onClick={close}>
