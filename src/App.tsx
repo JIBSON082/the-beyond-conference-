@@ -17,6 +17,8 @@ const LOGO_URL      = 'https://image2url.com/r2/default/images/1775682194312-829
 const HERO_IMG      = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
 const INSTAGRAM_URL = 'https://www.instagram.com/the_beyond_community?igsh=eDVtdGpvM3B3bTF5'
 
+const GLOBE_IMG = 'https://image2url.com/r2/default/images/1775526751389-21009a87-43a1-4cae-9afa-4ac23128ac50.jpg'
+
 const ACCOUNT = {
   number: '7350104678',
   bank:   'Wema Bank',
