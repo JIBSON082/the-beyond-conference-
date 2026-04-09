@@ -216,6 +216,8 @@ ul { list-style: none; }
   position: relative;
   vertical-align: baseline;
   line-height: inherit;
+  overflow: hidden;
+  border-radius: 50%;
 }
 
 .globe-o-img {
