@@ -211,9 +211,12 @@ ul { list-style: none; }
 /* ---- Rotating Globe O ---- */
 .globe-o-wrap {
   display: inline-block;
+  width: 0.82em;
+  height: 0.82em;
+  vertical-align: -0.1em;
+  border-radius: 50%;
+  overflow: hidden;
   position: relative;
-  vertical-align: baseline;
-  line-height: inherit;
 }
 
 .globe-o-wrap svg {
