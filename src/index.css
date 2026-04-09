@@ -211,60 +211,44 @@ ul { list-style: none; }
 /* ---- Rotating Globe O ---- */
 .globe-o-wrap {
   display: inline-block;
+  position: relative;
+  vertical-align: baseline;
+  line-height: inherit;
+}
+
+.globe-o-img {
+  display: inline-block;
   width: 0.82em;
   height: 0.82em;
-  vertical-align: -0.1em;
+  object-fit: cover;
   border-radius: 50%;
-  overflow: hidden;
   position: relative;
+  top: 0.06em;
+  will-change: transform;
+  box-shadow: 0 0 20px rgba(212,168,42,0.4), 0 0 60px rgba(212,168,42,0.15);
 }
 
-.globe-o-wrap svg {
-  display: inline-block;
-  vertical-align: baseline;
-  /* Match the font cap height — adjusted via em units */
-  width: 0.78em;
-  height: 0.78em;
-  position: relative;
-  top: 0.05em;
-  overflow: visible;
+.globe-o-glow {
+  position: absolute;
+  inset: -30%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,168,42,0.4) 0%, rgba(212,168,42,0.1) 45%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform, opacity;
 }
 
-/* The outer circle of the O */
-.globe-circle {
-  fill: none;
-  stroke: #FFFFFF;
-  stroke-width: 3;
+.globe-o-ring {
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  border: 1px solid rgba(212,168,42,0.45);
+  box-shadow: 0 0 8px rgba(212,168,42,0.25);
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
 }
 
-/* Meridian lines that rotate */
-.globe-meridians {
-  animation: globeSpin 6s linear infinite;
-  transform-origin: center;
-}
-
-/* Latitude lines stay static */
-.globe-latitudes {}
-
-@keyframes globeSpin {
-  from { transform: rotateY(0deg); }
-  to   { transform: rotateY(360deg); }
-}
-
-/* CSS-only globe rotation using perspective transform on the meridian group */
-.globe-spin-group {
-  transform-style: preserve-3d;
-  animation: spinMeridians 5s linear infinite;
-  transform-origin: 50% 50%;
-}
-
-@keyframes spinMeridians {
-  0%   { transform: scaleX(1); }
-  25%  { transform: scaleX(0); }
-  50%  { transform: scaleX(-1); }
-  75%  { transform: scaleX(0); }
-  100% { transform: scaleX(1); }
-}
 
 /* Hero details */
 .hero-details {
