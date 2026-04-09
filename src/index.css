@@ -225,7 +225,7 @@ ul { list-style: none; }
   object-fit: cover;
   border-radius: 50%;
   position: relative;
-  top: 0.12em;
+  top: 0.08em;
   will-change: transform;
   mix-blend-mode: screen;
   border: none;
