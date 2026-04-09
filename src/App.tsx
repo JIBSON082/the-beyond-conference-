@@ -16,6 +16,7 @@ const APPS_SCRIPT_URL: string = 'https://script.google.com/macros/s/AKfycbzIq98T
 const LOGO_URL      = 'https://image2url.com/r2/default/images/1775682194312-829bb538-a247-4460-a0a7-1705570be79c.jpg'
 const HERO_IMG      = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
 const INSTAGRAM_URL = 'https://www.instagram.com/the_beyond_community?igsh=eDVtdGpvM3B3bTF5'
+const GLOBE_IMG     = 'https://image2url.com/r2/default/images/1775735181650-a7f96510-90e2-44e4-b3b7-b413e64c75aa.jpg'
 
 const ACCOUNT = {
   number: '7350104678',
@@ -96,47 +97,104 @@ function IgIcon({ size = 16 }: { size?: number }) {
 }
 
 // ============================================================
-// ANIMATED GLOBE O
+// GLOBE O — Real earth image, 3-D spin, atmospheric glow
 // ============================================================
 
+const STAR_POSITIONS = [
+  { top: '4%',  left: '12%', s: 4 },
+  { top: '18%', left: '82%', s: 3 },
+  { top: '72%', left: '6%',  s: 3 },
+]
+
 function GlobeO() {
-  const globeRef = useRef<SVGSVGElement>(null)
+  const imgRef = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to('#meridian-group', {
-        scaleX: -1, duration: 2.5, ease: 'sine.inOut',
-        repeat: -1, yoyo: true, transformOrigin: 'center center',
+      // Continuous Y-axis spin — convincing 3-D earth rotation
+      gsap.to(imgRef.current, {
+        rotationY: 360,
+        duration: 14,
+        ease: 'none',
+        repeat: -1,
+        transformPerspective: 650,
+        transformOrigin: 'center center',
       })
-      gsap.to(globeRef.current, {
-        rotation: 360, duration: 18, ease: 'none',
-        repeat: -1, transformOrigin: 'center center',
+      // Atmospheric glow pulse
+      gsap.to('.globe-o-glow', {
+        opacity: 0.95, scale: 1.22, duration: 2.4,
+        ease: 'sine.inOut', repeat: -1, yoyo: true,
+        transformOrigin: 'center center',
       })
-      gsap.to('#globe-glow', {
-        opacity: 0.6, scale: 1.12, duration: 2, ease: 'sine.inOut',
-        repeat: -1, yoyo: true, transformOrigin: 'center center',
+      // Gold star sparkles
+      gsap.to('.globe-star', {
+        opacity: 1, scale: 1.6, duration: 0.65,
+        ease: 'sine.inOut', repeat: -1, yoyo: true,
+        stagger: { each: 0.28, from: 'random' },
       })
-    }, globeRef)
+    })
     return () => ctx.revert()
   }, [])
 
   return (
-    <span className="globe-o-wrap" aria-hidden="true">
-      <svg ref={globeRef} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ overflow: 'visible' }}>
-        <circle id="globe-glow" cx="50" cy="50" r="46" fill="rgba(212,168,42,0.08)" />
-        <circle cx="50" cy="50" r="44" fill="none" stroke="white" strokeWidth="5" />
-        <g stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none">
-          <ellipse cx="50" cy="50" rx="44" ry="12" />
-          <ellipse cx="50" cy="30" rx="36" ry="9" />
-          <ellipse cx="50" cy="70" rx="36" ry="9" />
-        </g>
-        <g id="meridian-group" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" fill="none">
-          <ellipse cx="50" cy="50" rx="3"  ry="44" />
-          <ellipse cx="50" cy="50" rx="28" ry="44" />
-          <ellipse cx="50" cy="50" rx="28" ry="44" transform="rotate(60,50,50)" />
-        </g>
-        <circle cx="64" cy="34" r="3.5" fill="var(--gold-light)" opacity="0.85" />
-      </svg>
+    <span
+      className="globe-o-wrap"
+      aria-hidden="true"
+      style={{
+        position: 'relative',
+        display: 'inline-block',
+        verticalAlign: '-0.06em',
+        overflow: 'visible',
+      }}
+    >
+      {/* Atmospheric halo */}
+      <span
+        className="globe-o-glow"
+        style={{
+          position: 'absolute',
+          inset: '-22%',
+          borderRadius: '50%',
+          background:
+            'radial-gradient(circle, rgba(80,160,255,0.28) 0%, rgba(255,195,40,0.14) 45%, transparent 70%)',
+          opacity: 0.55,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+      {/* Earth image — circular crop */}
+      <img
+        ref={imgRef}
+        src={GLOBE_IMG}
+        alt=""
+        style={{
+          display: 'block',
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          borderRadius: '50%',
+          position: 'relative',
+          zIndex: 1,
+          willChange: 'transform',
+        }}
+      />
+      {/* Gold lens-flare stars */}
+      {STAR_POSITIONS.map((p, i) => (
+        <span
+          key={i}
+          className="globe-star"
+          style={{
+            position: 'absolute',
+            width: p.s, height: p.s,
+            borderRadius: '50%',
+            background: '#F5C518',
+            boxShadow: `0 0 ${p.s * 4}px 1px #F5C518`,
+            opacity: 0.25,
+            top: p.top, left: p.left,
+            zIndex: 2,
+            pointerEvents: 'none',
+          }}
+        />
+      ))}
     </span>
   )
 }
@@ -234,54 +292,203 @@ function Navbar() {
 }
 
 // ============================================================
-// HERO
+// HERO — "Cosmic Expansion" Sequence
+// Globe Explosion → Scramble Text → Mouse Parallax
 // ============================================================
 
 function HeroSection() {
-  const heroRef    = useRef<HTMLElement>(null)
-  const imgRef     = useRef<HTMLDivElement>(null)
-  const eyebrowRef = useRef<HTMLDivElement>(null)
-  const titleRef   = useRef<HTMLHeadingElement>(null)
-  const detailsRef = useRef<HTMLDivElement>(null)
+  const heroRef     = useRef<HTMLElement>(null)
+  const imgRef      = useRef<HTMLDivElement>(null)
+  const eyebrowRef  = useRef<HTMLDivElement>(null)
+  const titleRef    = useRef<HTMLHeadingElement>(null)
+  const detailsRef  = useRef<HTMLDivElement>(null)
+  const globeExpRef = useRef<HTMLDivElement>(null)
+  const theBeyRef   = useRef<HTMLSpanElement>(null)
+  const ndRef       = useRef<HTMLSpanElement>(null)
+  const confRef     = useRef<HTMLSpanElement>(null)
+  const cleanupRef  = useRef<(() => void)[]>([])
 
+  // ── Scramble text: random chars → real letters ─────────────
+  const scramble = useCallback(
+    (el: HTMLElement | null, target: string, delay: number) => {
+      if (!el) return
+      const CHARS  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$!&'
+      const STEP   = 38   // ms per frame
+      const STEPS  = Math.floor(900 / STEP)
+      let step = 0
+      const tid = window.setTimeout(() => {
+        gsap.set(el, { opacity: 1 })
+        const iv = window.setInterval(() => {
+          step++
+          const pct = step / STEPS
+          el.textContent = target
+            .split('')
+            .map((ch, i) => {
+              if (ch === ' ') return ' '
+              if (i / target.length < pct) return ch
+              return CHARS[Math.floor(Math.random() * CHARS.length)]
+            })
+            .join('')
+          if (step >= STEPS) {
+            window.clearInterval(iv)
+            el.textContent = target
+          }
+        }, STEP)
+        cleanupRef.current.push(() => window.clearInterval(iv))
+      }, delay)
+      cleanupRef.current.push(() => window.clearTimeout(tid))
+    },
+    []
+  )
+
+  // ── Mouse / touch parallax (activates after intro) ─────────
+  useEffect(() => {
+    const hero = heroRef.current
+    if (!hero) return
+    let active = false
+    const enableTid = window.setTimeout(() => { active = true }, 4200)
+
+    const move = (x: number, y: number) => {
+      if (!active) return
+      const r  = hero.getBoundingClientRect()
+      const dx = (x - r.left - r.width  / 2) / (r.width  / 2)
+      const dy = (y - r.top  - r.height / 2) / (r.height / 2)
+      gsap.to(imgRef.current,      { x: dx * 20, y: dy * 12, duration: 1.4, ease: 'power2.out' })
+      gsap.to(titleRef.current,    { x: dx * 11, y: dy * 7,  duration: 1.2, ease: 'power2.out' })
+      gsap.to('.globe-o-wrap',     { x: dx * 28, y: dy * 17, duration: 1.0, ease: 'power2.out' })
+      gsap.to(eyebrowRef.current,  { x: dx * 7,  y: dy * 4,  duration: 1.6, ease: 'power2.out' })
+    }
+
+    const onMouse = (e: MouseEvent) => move(e.clientX, e.clientY)
+    const onTouch = (e: TouchEvent) => { const t = e.touches[0]; if (t) move(t.clientX, t.clientY) }
+
+    hero.addEventListener('mousemove', onMouse, { passive: true })
+    hero.addEventListener('touchmove', onTouch, { passive: true })
+
+    return () => {
+      window.clearTimeout(enableTid)
+      hero.removeEventListener('mousemove', onMouse)
+      hero.removeEventListener('touchmove', onTouch)
+    }
+  }, [])
+
+  // ── Main GSAP timeline ──────────────────────────────────────
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ delay: 0.3 })
-      tl.fromTo(imgRef.current,
-        { scale: 1.06, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 2.0, ease: 'power2.out' }
-      )
-      .fromTo(eyebrowRef.current,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, ease: 'power3.out' }, '-=1.4'
-      )
-      .fromTo(titleRef.current,
-        { y: 90, opacity: 0, skewY: 3 },
-        { y: 0, opacity: 1, skewY: 0, duration: 1.3, ease: 'power3.out' }, '-=0.8'
-      )
-      .fromTo(
+      // ── Initial states ──
+      gsap.set(globeExpRef.current,  { opacity: 0, scale: 0 })
+      gsap.set('.globe-o-wrap',      { opacity: 0, scale: 0.2 })
+      gsap.set([theBeyRef.current, ndRef.current, confRef.current], { opacity: 0 })
+      gsap.set(eyebrowRef.current,   { opacity: 0, y: 30 })
+      gsap.set(imgRef.current,       { scale: 1.08, opacity: 0 })
+      gsap.set(
         detailsRef.current ? Array.from(detailsRef.current.children) : [],
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.1, duration: 0.9, ease: 'power3.out' }, '-=0.8'
+        { opacity: 0, y: 35 }
       )
+
+      const tl = gsap.timeline({ delay: 0.1 })
+
+      // 1 ── Background drifts in ───────────────────────────
+      tl.to(imgRef.current, {
+        scale: 1, opacity: 1, duration: 1.5, ease: 'power2.out',
+      })
+
+      // 2 ── Globe emerges from center of screen ───────────
+      .to(globeExpRef.current, {
+        opacity: 1, duration: 0.22, ease: 'power2.out',
+      }, 0.5)
+      .to(globeExpRef.current, {
+        scale: 20, duration: 2.1, ease: 'power2.in',
+      }, 0.72)
+
+      // 3 ── Cosmic contraction — globe rushes inward ──────
+      .to(globeExpRef.current, {
+        scale: 0, opacity: 0, duration: 0.75, ease: 'expo.out',
+      })
+
+      // 4 ── Globe O snaps into the title ──────────────────
+      .to('.globe-o-wrap', {
+        opacity: 1, scale: 1, duration: 0.55, ease: 'back.out(2.8)',
+      }, '-=0.3')
+
+      // 5 ── Scramble text reveals ──────────────────────────
+      .add(() => {
+        scramble(theBeyRef.current, 'THE BEY', 0)
+        scramble(ndRef.current,     'ND',      130)
+        scramble(confRef.current,   'CONFERENCE', 260)
+      }, '-=0.15')
+
+      // 6 ── Eyebrow ────────────────────────────────────────
+      .to(eyebrowRef.current, {
+        y: 0, opacity: 1, duration: 0.9, ease: 'power3.out',
+      }, '+=0.25')
+
+      // 7 ── Details strip ──────────────────────────────────
+      .to(
+        detailsRef.current ? Array.from(detailsRef.current.children) : [],
+        { y: 0, opacity: 1, stagger: 0.1, duration: 0.8, ease: 'power3.out' },
+        '-=0.55'
+      )
+
+      // Scroll parallax on background image
       gsap.to(imgRef.current, {
         yPercent: 14, ease: 'none',
-        scrollTrigger: { trigger: heroRef.current, start: 'top top', end: 'bottom top', scrub: 1 },
+        scrollTrigger: {
+          trigger: heroRef.current, start: 'top top', end: 'bottom top', scrub: 1,
+        },
       })
     }, heroRef)
-    return () => ctx.revert()
-  }, [])
+
+    return () => {
+      ctx.revert()
+      cleanupRef.current.forEach(fn => fn())
+      cleanupRef.current = []
+    }
+  }, [scramble])
 
   return (
     <section id="home" ref={heroRef} className="hero-section">
+
+      {/* ── Explosion globe — fixed, viewport-centered ── */}
+      <div
+        ref={globeExpRef}
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          top: '50%', left: '50%',
+          width: 'min(55vw, 55vh)',
+          height: 'min(55vw, 55vh)',
+          marginTop: 'calc(min(55vw, 55vh) / -2)',
+          marginLeft: 'calc(min(55vw, 55vh) / -2)',
+          borderRadius: '50%',
+          overflow: 'hidden',
+          zIndex: 9990,
+          pointerEvents: 'none',
+          willChange: 'transform, opacity',
+          boxShadow: '0 0 80px 20px rgba(80,160,255,0.35), 0 0 40px 10px rgba(255,195,40,0.2)',
+        }}
+      >
+        <img
+          src={GLOBE_IMG} alt=""
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        />
+      </div>
+
       <div ref={imgRef} className="hero-image-bg" aria-hidden="true" />
       <div className="hero-overlay" aria-hidden="true" />
+
       <div className="hero-content">
         <div ref={eyebrowRef} className="hero-eyebrow">Theme: MORE</div>
+
         <h1 ref={titleRef} className="hero-title">
-          THE BEY<GlobeO />ND<br />CONFERENCE
+          <span ref={theBeyRef}>THE BEY</span>
+          <GlobeO />
+          <span ref={ndRef}>ND</span>
+          <br />
+          <span ref={confRef}>CONFERENCE</span>
           <span className="hero-year">2026</span>
         </h1>
+
         <div ref={detailsRef} className="hero-details">
           <div className="hero-detail-item">
             <span className="detail-label">Date</span>
@@ -304,6 +511,7 @@ function HeroSection() {
           </div>
         </div>
       </div>
+
       <div className="hero-scroll-cue" aria-hidden="true">
         <span>Scroll</span>
         <div className="scroll-line" />
