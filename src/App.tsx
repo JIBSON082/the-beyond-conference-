@@ -442,20 +442,17 @@ function HeroSection() {
         </div>
 
         <h1 className="hero-title">
-          {/* Each word wrapped in overflow:hidden mask for slide-up */}
-          <div className="hero-title-mask">
-            <div ref={word1Ref} className="hero-title-word">THE</div>
-          </div>
-          <div className="hero-title-mask">
-            <div ref={word2Ref} className="hero-title-word">
-              BEY<GlobeO />ND
-            </div>
-          </div>
-          <div className="hero-title-mask">
-            <div ref={word3Ref} className="hero-title-word">CONFERENCE</div>
-          </div>
-          <span ref={yearRef} className="hero-year">2026</span>
-        </h1>
+  <div ref={word1Ref} style={{ overflow:'hidden' }}>
+    <span style={{ display:'block' }}>THE</span>
+  </div>
+  <div ref={word2Ref} style={{ overflow:'hidden' }}>
+    <span style={{ display:'block' }}>BEY<GlobeO />ND</span>
+  </div>
+  <div ref={word3Ref} style={{ overflow:'hidden' }}>
+    <span style={{ display:'block' }}>CONFERENCE</span>
+  </div>
+  <span ref={yearRef} className="hero-year">2026</span>
+</h1>
 
         <div ref={detailsRef} className="hero-details">
           <div className="hero-detail-item">
