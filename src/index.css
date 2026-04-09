@@ -232,7 +232,7 @@ ul { list-style: none; }
 
 .globe-o-glow {
   position: absolute;
-  inset: -30%;
+  inset: -15%;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(212,168,42,0.4) 0%, rgba(212,168,42,0.1) 45%, transparent 70%);
   pointer-events: none;
@@ -242,7 +242,7 @@ ul { list-style: none; }
 
 .globe-o-ring {
   position: absolute;
-  inset: -12%;
+  inset: -6%;
   border-radius: 50%;
   border: 1px solid rgba(212,168,42,0.45);
   box-shadow: 0 0 8px rgba(212,168,42,0.25);
