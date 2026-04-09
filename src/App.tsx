@@ -13,7 +13,7 @@ const AMOUNT_RAISED = 0
 const TOTAL_BUDGET  = 2_400_000
 
 /** Paste your deployed Google Apps Script Web App URL here */
-const APPS_SCRIPT_URL: string= 'https://script.google.com/macros/s/AKfycbxWuizlSq67BLk7cH5MPN2Q5CnohB3LoM_UXcdJ37wvVipcRrBgz26uF6r-0gVOaPCv/exec'
+const APPS_SCRIPT_URL: string= 'https://script.google.com/macros/s/AKfycbzIq98TkiWFd-J6ySCOAclkPp-ORSucD9jz1nL7Fdz02oAdFpr_QXQ9apoRDLeLZ1-e/exec'
 
 const LOGO_URL     = 'https://image2url.com/r2/default/images/1775682194312-829bb538-a247-4460-a0a7-1705570be79c.jpg'
 const HERO_IMG     = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
@@ -52,30 +52,37 @@ const UNITS = [
 // ============================================================
 // HELPERS
 // ============================================================
+try {
+  const { stats } = incrementCount(unit)
 
-const formatNaira = (n: number) => '₦' + n.toLocaleString('en-NG')
+  const params = new URLSearchParams({
+    name:              form.name.trim(),
+    phone:             form.phone.trim(),
+    email:             form.email.trim(),
+    unit,
+    attending:         form.attending,
+    mode:              form.mode,
+    timestamp:         new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }),
+    totalAll:          String(stats.total),
+    countRegistration: String(stats.registration),
+    countMedia:        String(stats.media),
+    countUshering:     String(stats.ushering),
+    countProtocol:     String(stats.protocol),
+    countSponsorship:  String(stats.sponsorship),
+    countLogistics:    String(stats.logistics),
+    countWelfare:      String(stats.welfare),
+  })
 
-const incrementCount = (unit: string) => {
-  try {
-    const all = JSON.parse(localStorage.getItem('beyond_counts') || '{}')
-    all[unit] = (all[unit] || 0) + 1
-    localStorage.setItem('beyond_counts', JSON.stringify(all))
-    const total = UNITS.reduce((s, u) => s + (all[u.name] || 0), 0)
-    return { newCount: all[unit], allStats: all, total }
-  } catch {
-    return { newCount: 1, allStats: {}, total: 1 }
-  }
+  await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
+    method: 'GET',
+    mode:   'no-cors',
+  })
+
+  setStatus('success')
+} catch {
+  setStatus('error')
+  setErrMsg('Network error. Please check your connection and try again.')
 }
-
-async function sendToAppsScript(payload: Record<string, string | number>) {
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') return
-  try {
-    await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-  } catch (e) {
-    console.warn('Apps Script submission — check configuration.', e)
-  }
-}
-
 // ============================================================
 // INSTAGRAM SVG ICON
 // ============================================================
