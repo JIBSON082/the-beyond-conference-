@@ -5,18 +5,16 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
 
 // ============================================================
-// CONFIGURATION — EDIT THESE
+// CONFIGURATION
 // ============================================================
 
-/** Update this value (in Naira) as donations arrive */
 const AMOUNT_RAISED = 0
 const TOTAL_BUDGET  = 2_400_000
 
-/** Paste your deployed Google Apps Script Web App URL here */
-const APPS_SCRIPT_URL: string= 'https://script.google.com/macros/s/AKfycbzIq98TkiWFd-J6ySCOAclkPp-ORSucD9jz1nL7Fdz02oAdFpr_QXQ9apoRDLeLZ1-e/exec'
+const APPS_SCRIPT_URL: string = 'https://script.google.com/macros/s/AKfycbzIq98TkiWFd-J6ySCOAclkPp-ORSucD9jz1nL7Fdz02oAdFpr_QXQ9apoRDLeLZ1-e/exec'
 
-const LOGO_URL     = 'https://image2url.com/r2/default/images/1775682194312-829bb538-a247-4460-a0a7-1705570be79c.jpg'
-const HERO_IMG     = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
+const LOGO_URL      = 'https://image2url.com/r2/default/images/1775682194312-829bb538-a247-4460-a0a7-1705570be79c.jpg'
+const HERO_IMG      = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
 const INSTAGRAM_URL = 'https://www.instagram.com/the_beyond_community?igsh=eDVtdGpvM3B3bTF5'
 
 const ACCOUNT = {
@@ -37,6 +35,7 @@ const WHATSAPP: Record<string, string> = {
   'Sponsorship Unit':  'https://chat.whatsapp.com/JNygLrMq5ijKhlM6tJdqr6?mode=gi_t',
   'Logistics Unit':    'https://chat.whatsapp.com/K1FDddLx5UqIGR84uMIXw9?mode=gi_t',
   'Welfare Unit':      'https://chat.whatsapp.com/GpvOt5Vxo6sEoHf8kuffXI?mode=gi_t',
+
 }
 
 const UNITS = [
@@ -49,57 +48,48 @@ const UNITS = [
   { name: 'Welfare Unit',      desc: 'Champion the comfort and wellbeing of every person present.' },
 ]
 
+const NAV_SECTIONS = [
+  { label: 'Home',                   href: '#home'         },
+  { label: 'Our Vision',             href: '#vision'       },
+  { label: 'Partnerships & Support', href: '#partnerships' },
+  { label: 'Call for Volunteers',    href: '#volunteers'   },
+]
+
 // ============================================================
 // HELPERS
 // ============================================================
-try {
-  const { stats } = incrementCount(unit)
 
-  const params = new URLSearchParams({
-    name:              form.name.trim(),
-    phone:             form.phone.trim(),
-    email:             form.email.trim(),
-    unit,
-    attending:         form.attending,
-    mode:              form.mode,
-    timestamp:         new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos' }),
-    totalAll:          String(stats.total),
-    countRegistration: String(stats.registration),
-    countMedia:        String(stats.media),
-    countUshering:     String(stats.ushering),
-    countProtocol:     String(stats.protocol),
-    countSponsorship:  String(stats.sponsorship),
-    countLogistics:    String(stats.logistics),
-    countWelfare:      String(stats.welfare),
-  })
+const formatNaira = (n: number) => '₦' + n.toLocaleString('en-NG')
 
-  await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
-    method: 'GET',
-    mode:   'no-cors',
-  })
-
-  setStatus('success')
-} catch {
-  setStatus('error')
-  setErrMsg('Network error. Please check your connection and try again.')
+const incrementCount = (unit: string): {
+  newCount: number
+  allStats: Record<string, number>
+  total: number
+} => {
+  try {
+    const all: Record<string, number> = JSON.parse(localStorage.getItem('beyond_counts') || '{}')
+    all[unit] = (all[unit] || 0) + 1
+    localStorage.setItem('beyond_counts', JSON.stringify(all))
+    const total = UNITS.reduce((s, u) => s + (all[u.name] || 0), 0)
+    return { newCount: all[unit], allStats: all, total }
+  } catch {
+    return { newCount: 1, allStats: {}, total: 1 }
+  }
 }
+
 // ============================================================
-// INSTAGRAM SVG ICON
+// INSTAGRAM ICON
 // ============================================================
 
 function IgIcon({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      {/* Outer rounded square body */}
       <rect x="3" y="3" width="18" height="16" rx="5.5" ry="5.5"
         stroke="currentColor" strokeWidth="2" fill="none"/>
-      {/* Lens circle */}
       <circle cx="12" cy="12" r="3.8"
         stroke="currentColor" strokeWidth="2" fill="none"/>
-      {/* Inner lens ring */}
       <circle cx="12" cy="12" r="1.6"
         stroke="currentColor" strokeWidth="0.8" opacity="0.5" fill="none"/>
-      {/* Flash dot */}
       <circle cx="17" cy="7" r="1.3" fill="currentColor"/>
     </svg>
   )
@@ -107,7 +97,6 @@ function IgIcon({ size = 16 }: { size?: number }) {
 
 // ============================================================
 // ANIMATED GLOBE O
-// The O in "BEYOND" rendered as a rotating SVG globe
 // ============================================================
 
 function GlobeO() {
@@ -115,73 +104,37 @@ function GlobeO() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Meridian lines spin — scaleX creates the 3-D longitude illusion
       gsap.to('#meridian-group', {
-        scaleX:   -1,
-        duration: 2.5,
-        ease:     'sine.inOut',
-        repeat:   -1,
-        yoyo:     true,
-        transformOrigin: 'center center',
+        scaleX: -1, duration: 2.5, ease: 'sine.inOut',
+        repeat: -1, yoyo: true, transformOrigin: 'center center',
       })
-      // Subtle continuous rotation of the whole globe
       gsap.to(globeRef.current, {
-        rotation: 360,
-        duration: 18,
-        ease:     'none',
-        repeat:   -1,
-        transformOrigin: 'center center',
+        rotation: 360, duration: 18, ease: 'none',
+        repeat: -1, transformOrigin: 'center center',
       })
-      // Perpetual glow pulse
       gsap.to('#globe-glow', {
-        opacity: 0.6,
-        scale:   1.12,
-        duration: 2,
-        ease:    'sine.inOut',
-        repeat:  -1,
-        yoyo:    true,
-        transformOrigin: 'center center',
+        opacity: 0.6, scale: 1.12, duration: 2, ease: 'sine.inOut',
+        repeat: -1, yoyo: true, transformOrigin: 'center center',
       })
     }, globeRef)
     return () => ctx.revert()
   }, [])
 
-  // SVG viewBox is 0 0 100 100, representing the letter O as a globe
   return (
     <span className="globe-o-wrap" aria-hidden="true">
-      <svg
-        ref={globeRef}
-        viewBox="0 0 100 100"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ overflow: 'visible' }}
-      >
-        {/* Glow */}
+      <svg ref={globeRef} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ overflow: 'visible' }}>
         <circle id="globe-glow" cx="50" cy="50" r="46" fill="rgba(212,168,42,0.08)" />
-
-        {/* Outer ring — the O shape */}
         <circle cx="50" cy="50" r="44" fill="none" stroke="white" strokeWidth="5" />
-
-        {/* Latitude lines (static) */}
         <g stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none">
-          {/* Equator */}
           <ellipse cx="50" cy="50" rx="44" ry="12" />
-          {/* Upper latitude */}
           <ellipse cx="50" cy="30" rx="36" ry="9" />
-          {/* Lower latitude */}
           <ellipse cx="50" cy="70" rx="36" ry="9" />
         </g>
-
-        {/* Meridian lines — these get scaleX toggled for spin illusion */}
         <g id="meridian-group" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" fill="none">
-          {/* Centre meridian — full ellipse */}
           <ellipse cx="50" cy="50" rx="3"  ry="44" />
-          {/* Left meridian */}
           <ellipse cx="50" cy="50" rx="28" ry="44" />
-          {/* Right meridian */}
           <ellipse cx="50" cy="50" rx="28" ry="44" transform="rotate(60,50,50)" />
         </g>
-
-        {/* Gold highlight dot — like a star on the globe */}
         <circle cx="64" cy="34" r="3.5" fill="var(--gold-light)" opacity="0.85" />
       </svg>
     </span>
@@ -210,13 +163,6 @@ function Loader({ onDone }: { onDone: () => void }) {
 // ============================================================
 // NAVBAR
 // ============================================================
-
-const NAV_SECTIONS = [
-  { label: 'Home',                   href: '#home'         },
-  { label: 'Our Vision',             href: '#vision'       },
-  { label: 'Partnerships & Support', href: '#partnerships' },
-  { label: 'Call for Volunteers',    href: '#volunteers'   },
-]
 
 function Navbar() {
   const [open, setOpen]         = useState(false)
@@ -251,7 +197,6 @@ function Navbar() {
   return (
     <>
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-        {/* Logo + Instagram icon grouped together */}
         <div className="nav-left">
           <button className="nav-logo" onClick={() => navigate('#home')} aria-label="Home">
             <img src={LOGO_URL} alt="The Beyond Conference" />
@@ -266,7 +211,6 @@ function Navbar() {
             <IgIcon size={16} />
           </a>
         </div>
-
         <button
           className={`hamburger ${open ? 'active' : ''}`}
           onClick={() => setOpen(v => !v)}
@@ -320,8 +264,6 @@ function HeroSection() {
         { y: 40, opacity: 0 },
         { y: 0, opacity: 1, stagger: 0.1, duration: 0.9, ease: 'power3.out' }, '-=0.8'
       )
-
-      // Subtle parallax
       gsap.to(imgRef.current, {
         yPercent: 14, ease: 'none',
         scrollTrigger: { trigger: heroRef.current, start: 'top top', end: 'bottom top', scrub: 1 },
@@ -332,22 +274,14 @@ function HeroSection() {
 
   return (
     <section id="home" ref={heroRef} className="hero-section">
-      <div
-        ref={imgRef}
-        className="hero-image-bg"
-        style={{}}
-        aria-hidden="true"
-      />
+      <div ref={imgRef} className="hero-image-bg" aria-hidden="true" />
       <div className="hero-overlay" aria-hidden="true" />
-
       <div className="hero-content">
         <div ref={eyebrowRef} className="hero-eyebrow">Theme: MORE</div>
-
         <h1 ref={titleRef} className="hero-title">
           THE BEY<GlobeO />ND<br />CONFERENCE
           <span className="hero-year">2026</span>
         </h1>
-
         <div ref={detailsRef} className="hero-details">
           <div className="hero-detail-item">
             <span className="detail-label">Date</span>
@@ -370,7 +304,6 @@ function HeroSection() {
           </div>
         </div>
       </div>
-
       <div className="hero-scroll-cue" aria-hidden="true">
         <span>Scroll</span>
         <div className="scroll-line" />
@@ -395,11 +328,11 @@ function VisionSection() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 82%' } })
-      gsap.fromTo('.v-label',    { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.v-label') })
-      gsap.fromTo('.v-head',     { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.v-head') })
-      gsap.fromTo('.v-intro p',  { y:35,opacity:0 }, { y:0,opacity:1,stagger:0.2,duration:1, ...st('.v-intro') })
+      gsap.fromTo('.v-label',       { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.v-label') })
+      gsap.fromTo('.v-head',        { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.v-head') })
+      gsap.fromTo('.v-intro p',     { y:35,opacity:0 }, { y:0,opacity:1,stagger:0.2,duration:1, ...st('.v-intro') })
       gsap.fromTo('.vision-pillar', { y:60,opacity:0,scale:0.97 }, { y:0,opacity:1,scale:1,stagger:0.12,duration:1,ease:'power3.out', scrollTrigger:{ trigger:'.vision-pillars',start:'top 78%' } })
-      gsap.fromTo('.v-closing',  { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.v-closing') })
+      gsap.fromTo('.v-closing',     { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.v-closing') })
     }, ref)
     return () => ctx.revert()
   }, [])
@@ -449,8 +382,8 @@ function PartnershipsSection() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 82%' } })
-      gsap.fromTo('.p-label', { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.p-label') })
-      gsap.fromTo('.p-head',  { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.p-head') })
+      gsap.fromTo('.p-label',      { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.p-label') })
+      gsap.fromTo('.p-head',       { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.p-head') })
       gsap.fromTo('.support-item', { x:-40,opacity:0 }, { x:0,opacity:1,stagger:0.08,duration:0.8,ease:'power3.out', scrollTrigger:{ trigger:'.support-list',start:'top 80%' } })
       gsap.fromTo(fillRef.current, { width:'0%' }, { width:`${pct}%`, duration:2.4, ease:'power2.out', scrollTrigger:{ trigger:'.progress-track',start:'top 80%' } })
       gsap.fromTo('.account-card', { y:30,opacity:0 }, { y:0,opacity:1,duration:0.9,ease:'power3.out', ...st('.account-card') })
@@ -523,9 +456,10 @@ interface FormState {
 type SubmitStatus = 'idle' | 'sending' | 'success' | 'error'
 
 function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [form, setForm]     = useState<FormState>({ name:'', phone:'', email:'', attending:'', mode:'' })
-  const [status, setStatus] = useState<SubmitStatus>('idle')
+  const ref                     = useRef<HTMLDivElement>(null)
+  const [form, setForm]         = useState<FormState>({ name:'', phone:'', email:'', attending:'', mode:'' })
+  const [status, setStatus]     = useState<SubmitStatus>('idle')
+  const [errMsg, setErrMsg]     = useState('')
 
   useEffect(() => {
     gsap.fromTo(ref.current, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: 'power3.out' })
@@ -542,25 +476,47 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
 
   const submit = async () => {
     if (!form.name || !form.phone || !form.email || !form.attending || !form.mode) {
-      alert('Please complete all fields before confirming.'); return
+      setErrMsg('Please complete all fields before confirming.')
+      return
     }
+    setErrMsg('')
     setStatus('sending')
-    const { newCount, allStats, total } = incrementCount(unit)
-    const now = new Date().toLocaleString('en-NG', { timeZone:'Africa/Lagos', dateStyle:'long', timeStyle:'short' })
-    await sendToAppsScript({
-      name: form.name, phone: form.phone, email: form.email,
-      unit, attending: form.attending, mode: form.mode, timestamp: now,
-      totalAll: total,
-      countRegistration: allStats['Registration Unit'] || 0,
-      countMedia:        allStats['Media Unit']        || 0,
-      countUshering:     allStats['Ushering Unit']     || 0,
-      countProtocol:     allStats['Protocol Unit']     || 0,
-      countSponsorship:  allStats['Sponsorship Unit']  || 0,
-      countLogistics:    allStats['Logistics Unit']    || 0,
-      countWelfare:      allStats['Welfare Unit']      || 0,
+
+    const { allStats, total } = incrementCount(unit)
+    const now = new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos', dateStyle: 'long', timeStyle: 'short' })
+
+    const params = new URLSearchParams({
+      name:              form.name.trim(),
+      phone:             form.phone.trim(),
+      email:             form.email.trim(),
+      unit,
+      attending:         form.attending,
+      mode:              form.mode,
+      timestamp:         now,
+      totalAll:          String(total),
+      countRegistration: String(allStats['Registration Unit'] || 0),
+      countMedia:        String(allStats['Media Unit']        || 0),
+      countUshering:     String(allStats['Ushering Unit']     || 0),
+      countProtocol:     String(allStats['Protocol Unit']     || 0),
+      countSponsorship:  String(allStats['Sponsorship Unit']  || 0),
+      countLogistics:    String(allStats['Logistics Unit']    || 0),
+      countWelfare:      String(allStats['Welfare Unit']      || 0),
     })
-    setStatus('success')
-    setTimeout(() => { window.open(WHATSAPP[unit], '_blank', 'noopener,noreferrer'); close() }, 2600)
+
+    try {
+      await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
+        method: 'GET',
+        mode:   'no-cors',
+      })
+      setStatus('success')
+      setTimeout(() => {
+        window.open(WHATSAPP[unit], '_blank', 'noopener,noreferrer')
+        close()
+      }, 2600)
+    } catch {
+      setStatus('error')
+      setErrMsg('Network error. Please check your connection and try again.')
+    }
   }
 
   return (
@@ -619,7 +575,7 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
                 </div>
               </div>
             </div>
-            {status === 'error' && <p className="error-msg">Something went wrong. Please try again.</p>}
+            {errMsg && <p className="error-msg">{errMsg}</p>}
             <button className="confirm-btn" onClick={submit} disabled={status === 'sending'}>
               {status === 'sending' ? 'Submitting...' : 'Confirm Registration'}
             </button>
@@ -635,8 +591,9 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
 // ============================================================
 
 function VolunteersSection() {
-  const ref           = useRef<HTMLElement>(null)
-  const [active, setActive] = useState<string | null>(null)
+  const ref                     = useRef<HTMLElement>(null)
+  const [active, setActive]     = useState<string | null>(null)
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 85%' } })
@@ -647,6 +604,7 @@ function VolunteersSection() {
     }, ref)
     return () => ctx.revert()
   }, [])
+
   return (
     <section id="volunteers" ref={ref} className="volunteers-section">
       <div className="section-container">
