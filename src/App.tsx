@@ -257,50 +257,206 @@ function Navbar() {
 // ============================================================
 
 function HeroSection() {
-  const heroRef    = useRef<HTMLElement>(null)
-  const imgRef     = useRef<HTMLDivElement>(null)
-  const eyebrowRef = useRef<HTMLDivElement>(null)
-  const titleRef   = useRef<HTMLHeadingElement>(null)
-  const detailsRef = useRef<HTMLDivElement>(null)
+  const heroRef      = useRef<HTMLElement>(null)
+  const bgRef        = useRef<HTMLDivElement>(null)
+  const eyebrowRef   = useRef<HTMLDivElement>(null)
+  const word1Ref     = useRef<HTMLDivElement>(null)
+  const word2Ref     = useRef<HTMLDivElement>(null)
+  const word3Ref     = useRef<HTMLDivElement>(null)
+  const yearRef      = useRef<HTMLSpanElement>(null)
+  const detailsRef   = useRef<HTMLDivElement>(null)
+  const particlesRef = useRef<HTMLDivElement>(null)
+  const ambientRef   = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ delay: 0.3 })
-      tl.fromTo(imgRef.current,
-        { scale: 1.06, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 2.0, ease: 'power2.out' }
+
+      // ── Floating ambient particles ──────────────────
+      const pEl = particlesRef.current
+      if (pEl) {
+        for (let i = 0; i < 24; i++) {
+          const dot = document.createElement('span')
+          const size = 1.5 + Math.random() * 3.5
+          dot.style.cssText = `
+            position:absolute;
+            width:${size}px; height:${size}px;
+            border-radius:50%;
+            background:rgba(212,168,42,${0.15 + Math.random() * 0.45});
+            left:${Math.random() * 100}%;
+            top:${10 + Math.random() * 85}%;
+            pointer-events:none;
+            will-change:transform,opacity;
+          `
+          pEl.appendChild(dot)
+          gsap.fromTo(dot,
+            { opacity: 0, y: 0 },
+            {
+              opacity: 0.8,
+              y: -(60 + Math.random() * 140),
+              x: (Math.random() - 0.5) * 50,
+              duration: 5 + Math.random() * 7,
+              delay: Math.random() * 6,
+              repeat: -1,
+              ease: 'none',
+              onRepeat() { gsap.set(dot, { opacity: 0, y: 0 }) },
+            }
+          )
+        }
+      }
+
+      // ── Master timeline ─────────────────────────────
+      const tl = gsap.timeline({ delay: 0.35 })
+
+      // BG: cinematic slow scale in
+      tl.fromTo(bgRef.current,
+        { scale: 1.1, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 2.4, ease: 'power2.out' }
       )
+
+      // Ambient glow: blooms behind title
+      .fromTo(ambientRef.current,
+        { scale: 0.4, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 2, ease: 'power2.out' },
+        '-=2.2'
+      )
+
+      // Eyebrow: hard clip-path wipe left → right
       .fromTo(eyebrowRef.current,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, ease: 'power3.out' }, '-=1.4'
+        { clipPath: 'inset(0 100% 0 0)', opacity: 1 },
+        { clipPath: 'inset(0 0% 0 0)', duration: 1, ease: 'power3.out' },
+        '-=1.8'
       )
-      .fromTo(titleRef.current,
-        { y: 90, opacity: 0, skewY: 3 },
-        { y: 0, opacity: 1, skewY: 0, duration: 1.3, ease: 'power3.out' }, '-=0.8'
+
+      // "THE" — slides up masked
+      .fromTo(word1Ref.current,
+        { y: '105%', opacity: 0 },
+        { y: '0%', opacity: 1, duration: 1.0, ease: 'power4.out' },
+        '-=0.65'
       )
+
+      // "BEYOND" (with globe O) — slides up with slight scale
+      .fromTo(word2Ref.current,
+        { y: '105%', opacity: 0, scale: 0.96 },
+        { y: '0%', opacity: 1, scale: 1, duration: 1.1, ease: 'power4.out' },
+        '-=0.75'
+      )
+
+      // "CONFERENCE" — slides up last
+      .fromTo(word3Ref.current,
+        { y: '105%', opacity: 0 },
+        { y: '0%', opacity: 1, duration: 1.0, ease: 'power4.out' },
+        '-=0.8'
+      )
+
+      // Year — fades in from left
+      .fromTo(yearRef.current,
+        { x: -40, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.9, ease: 'power3.out' },
+        '-=0.5'
+      )
+
+      // Detail items — each slides up staggered
       .fromTo(
         detailsRef.current ? Array.from(detailsRef.current.children) : [],
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.1, duration: 0.9, ease: 'power3.out' }, '-=0.8'
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, stagger: 0.1, duration: 0.8, ease: 'power3.out' },
+        '-=0.4'
       )
-      gsap.to(imgRef.current, {
-        yPercent: 14, ease: 'none',
-        scrollTrigger: { trigger: heroRef.current, start: 'top top', end: 'bottom top', scrub: 1 },
+
+      // ── Scroll parallax — multi-layer depth ─────────
+      // Background moves slowest
+      gsap.to(bgRef.current, {
+        yPercent: 20,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.5,
+        },
       })
+
+      // Ambient glow moves medium speed
+      gsap.to(ambientRef.current, {
+        yPercent: 35,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 2,
+        },
+      })
+
+      // Title drifts up slightly on scroll
+      gsap.to([word1Ref.current, word2Ref.current, word3Ref.current], {
+        yPercent: -10,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 2.5,
+        },
+      })
+
+      // ── Subtle mouse parallax on title ───────────────
+      const onMouseMove = (e: MouseEvent) => {
+        const xPct = (e.clientX / window.innerWidth  - 0.5) * 18
+        const yPct = (e.clientY / window.innerHeight - 0.5) * 10
+        gsap.to([word1Ref.current, word2Ref.current, word3Ref.current], {
+          x: xPct, y: yPct,
+          duration: 1.8,
+          ease: 'power2.out',
+          overwrite: 'auto',
+        })
+        gsap.to(ambientRef.current, {
+          x: xPct * 2, y: yPct * 2,
+          duration: 2.2,
+          ease: 'power2.out',
+          overwrite: 'auto',
+        })
+      }
+      window.addEventListener('mousemove', onMouseMove, { passive: true })
+      return () => window.removeEventListener('mousemove', onMouseMove)
+
     }, heroRef)
     return () => ctx.revert()
   }, [])
 
   return (
     <section id="home" ref={heroRef} className="hero-section">
-      <div ref={imgRef} className="hero-image-bg" aria-hidden="true" />
+      <div ref={bgRef} className="hero-image-bg" style={{}} aria-hidden="true" />
+
+      {/* Floating particles layer */}
+      <div ref={particlesRef} className="hero-particles" aria-hidden="true" />
+
+      {/* Ambient radial glow bloom behind title */}
+      <div ref={ambientRef} className="hero-ambient-glow" aria-hidden="true" />
+
       <div className="hero-overlay" aria-hidden="true" />
+
       <div className="hero-content">
-        <div ref={eyebrowRef} className="hero-eyebrow">Theme: MORE</div>
-        <h1 ref={titleRef} className="hero-title">
-          THE BEY<GlobeO />ND<br />CONFERENCE
-          <span className="hero-year">2026</span>
+        <div ref={eyebrowRef} className="hero-eyebrow" style={{ clipPath: 'inset(0 100% 0 0)' }}>
+          Theme: MORE
+        </div>
+
+        <h1 className="hero-title">
+          {/* Each word wrapped in overflow:hidden mask for slide-up */}
+          <div className="hero-title-mask">
+            <div ref={word1Ref} className="hero-title-word">THE</div>
+          </div>
+          <div className="hero-title-mask">
+            <div ref={word2Ref} className="hero-title-word">
+              BEY<GlobeO />ND
+            </div>
+          </div>
+          <div className="hero-title-mask">
+            <div ref={word3Ref} className="hero-title-word">CONFERENCE</div>
+          </div>
+          <span ref={yearRef} className="hero-year">2026</span>
         </h1>
+
         <div ref={detailsRef} className="hero-details">
           <div className="hero-detail-item">
             <span className="detail-label">Date</span>
@@ -323,6 +479,7 @@ function HeroSection() {
           </div>
         </div>
       </div>
+
       <div className="hero-scroll-cue" aria-hidden="true">
         <span>Scroll</span>
         <div className="scroll-line" />
