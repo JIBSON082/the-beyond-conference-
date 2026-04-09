@@ -17,8 +17,6 @@ const LOGO_URL      = 'https://image2url.com/r2/default/images/1775682194312-829
 const HERO_IMG      = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
 const INSTAGRAM_URL = 'https://www.instagram.com/the_beyond_community?igsh=eDVtdGpvM3B3bTF5'
 
-const GLOBE_IMG = '<img src="https://image2url.com/r2/default/images/1775746610770-89cc6a47-c9d1-44a0-b5df-edac93cdc94c.jpg" alt="image" />'
-
 const ACCOUNT = {
   number: '7350104678',
   bank:   'Wema Bank',
@@ -102,70 +100,47 @@ function IgIcon({ size = 16 }: { size?: number }) {
 // ============================================================
 
 function GlobeO() {
-  const containerRef = useRef<HTMLSpanElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const globeRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Gentle rotation for the new globe image
-      gsap.to(imgRef.current, {
-        rotation: 360,
-        duration: 25, // Slower rotation for a more premium feel
-        ease: 'none',
-        repeat: -1,
-      });
-
-      // Pulse effect on the outer glow
-      gsap.to('.globe-outer-glow', {
-        opacity: 0.5,
-        scale: 1.15,
-        duration: 3,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-      });
-    }, containerRef);
-    
-    return () => ctx.revert();
-  }, []);
+      gsap.to('#meridian-group', {
+        scaleX: -1, duration: 2.5, ease: 'sine.inOut',
+        repeat: -1, yoyo: true, transformOrigin: 'center center',
+      })
+      gsap.to(globeRef.current, {
+        rotation: 360, duration: 18, ease: 'none',
+        repeat: -1, transformOrigin: 'center center',
+      })
+      gsap.to('#globe-glow', {
+        opacity: 0.6, scale: 1.12, duration: 2, ease: 'sine.inOut',
+        repeat: -1, yoyo: true, transformOrigin: 'center center',
+      })
+    }, globeRef)
+    return () => ctx.revert()
+  }, [])
 
   return (
-    <span ref={containerRef} className="globe-o-wrap" aria-hidden="true" style={{ 
-      position: 'relative', 
-      display: 'inline-flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      verticalAlign: 'middle',
-      width: '1.1em', // Adjust based on your font size
-      height: '1.1em'
-    }}>
-      {/* Visual Glow Layer */}
-      <div className="globe-outer-glow" style={{
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(212,168,42,0.3) 0%, transparent 70%)',
-        zIndex: 0
-      }} />
-
-      {/* The Globe Image */}
-      <img 
-        ref={imgRef}
-        src={GLOBE_IMG} 
-        alt="Globe" 
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'contain',
-          borderRadius: '50%', // Ensures the image remains circular
-          zIndex: 1,
-          boxShadow: '0 0 15px rgba(0,0,0,0.5)' // Soft shadow for depth
-        }}
-      />
+    <span className="globe-o-wrap" aria-hidden="true">
+      <svg ref={globeRef} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ overflow: 'visible' }}>
+        <circle id="globe-glow" cx="50" cy="50" r="46" fill="rgba(212,168,42,0.08)" />
+        <circle cx="50" cy="50" r="44" fill="none" stroke="white" strokeWidth="5" />
+        <g stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none">
+          <ellipse cx="50" cy="50" rx="44" ry="12" />
+          <ellipse cx="50" cy="30" rx="36" ry="9" />
+          <ellipse cx="50" cy="70" rx="36" ry="9" />
+        </g>
+        <g id="meridian-group" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" fill="none">
+          <ellipse cx="50" cy="50" rx="3"  ry="44" />
+          <ellipse cx="50" cy="50" rx="28" ry="44" />
+          <ellipse cx="50" cy="50" rx="28" ry="44" transform="rotate(60,50,50)" />
+        </g>
+        <circle cx="64" cy="34" r="3.5" fill="var(--gold-light)" opacity="0.85" />
+      </svg>
     </span>
-  );
+  )
 }
+
 // ============================================================
 // LOADER
 // ============================================================
