@@ -249,6 +249,46 @@ ul { list-style: none; }
   will-change: transform;
 }
 
+/* ---- Hero title word masks ---- */
+.hero-title-mask {
+  display: block;
+  overflow: hidden;
+  line-height: 0.97;
+}
+
+.hero-title-word {
+  display: block;
+  will-change: transform;
+}
+
+/* ---- Hero particles layer ---- */
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ---- Ambient glow bloom ---- */
+.hero-ambient-glow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(300px, 60vw, 700px);
+  height: clamp(300px, 60vw, 700px);
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(212,168,42,0.09) 0%,
+    rgba(126,200,227,0.05) 35%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, opacity;
+}
+
 
 /* Hero details */
 .hero-details {
