@@ -220,8 +220,8 @@ ul { list-style: none; }
 
 .globe-o-img {
   display: inline-block;
-  width: 0.72em;
-  height: 0.72em;
+  width: 0.74em;
+  height: 0.74em;
   object-fit: cover;
   border-radius: 50%;
   position: relative;
@@ -230,7 +230,7 @@ ul { list-style: none; }
   mix-blend-mode: screen;
   border: none;
   outline: none;
-  filter: brightness(1.4) contrast(0.9) saturate(1.2);
+  filter: brightness(1.1) contrast(1.05);
   box-shadow: 0 0 12px rgba(212,168,42,0.2), 0 0 30px rgba(212,168,42,0.08);
 }
 .globe-o-glow {
