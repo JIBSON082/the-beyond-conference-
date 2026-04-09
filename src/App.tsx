@@ -13,7 +13,7 @@ const AMOUNT_RAISED = 0
 const TOTAL_BUDGET  = 2_400_000
 
 /** Paste your deployed Google Apps Script Web App URL here */
-const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL'
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGhKUVsNphBwLGXjrpbGKuSYFTgTJFmAlDwOtw-XEJNyrsvF5dABSmqGiBvxw-sUqJ/exec'
 
 const LOGO_URL     = 'https://image2url.com/r2/default/images/1775682194312-829bb538-a247-4460-a0a7-1705570be79c.jpg'
 const HERO_IMG     = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
