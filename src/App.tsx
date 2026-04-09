@@ -503,21 +503,14 @@ function VolunteerModal({ unit, onClose }: { unit: string; onClose: () => void }
       countWelfare:      String(allStats['Welfare Unit']      || 0),
     })
 
-    try {
-      await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
-        method: 'GET',
-        mode:   'no-cors',
-      })
-      setStatus('success')
-      setTimeout(() => {
-        window.open(WHATSAPP[unit], '_blank', 'noopener,noreferrer')
-        close()
-      }, 2600)
-    } catch {
-      setStatus('error')
-      setErrMsg('Network error. Please check your connection and try again.')
-    }
-  }
+    fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
+      method: 'GET',
+      mode:   'no-cors',
+    })
+
+    // Open WhatsApp immediately, no waiting
+    window.open(WHATSAPP[unit], '_blank', 'noopener,noreferrer')
+    close()
 
   return (
     <div className="modal-backdrop" onClick={close}>
