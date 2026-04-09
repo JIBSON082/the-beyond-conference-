@@ -100,47 +100,65 @@ function IgIcon({ size = 16 }: { size?: number }) {
 // ============================================================
 
 function GlobeO() {
-  const globeRef = useRef<SVGSVGElement>(null)
+  const wrapRef = useRef<HTMLSpanElement>(null)
+  const imgRef  = useRef<HTMLImageElement>(null)
+  const glowRef = useRef<HTMLSpanElement>(null)
+  const ringRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to('#meridian-group', {
-        scaleX: -1, duration: 2.5, ease: 'sine.inOut',
-        repeat: -1, yoyo: true, transformOrigin: 'center center',
+      // Smooth continuous globe rotation
+      gsap.to(imgRef.current, {
+        rotation: 360,
+        duration: 10,
+        ease: 'none',
+        repeat: -1,
+        transformOrigin: 'center center',
       })
-      gsap.to(globeRef.current, {
-        rotation: 360, duration: 18, ease: 'none',
-        repeat: -1, transformOrigin: 'center center',
+      // Outer glow ring breathes
+      gsap.to(glowRef.current, {
+        scale: 1.22,
+        opacity: 0.9,
+        duration: 2.4,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+        transformOrigin: 'center center',
       })
-      gsap.to('#globe-glow', {
-        opacity: 0.6, scale: 1.12, duration: 2, ease: 'sine.inOut',
-        repeat: -1, yoyo: true, transformOrigin: 'center center',
+      // Orbit ring rotates opposite direction
+      gsap.to(ringRef.current, {
+        rotation: -360,
+        duration: 7,
+        ease: 'none',
+        repeat: -1,
+        transformOrigin: 'center center',
       })
-    }, globeRef)
+      // Subtle perpetual float
+      gsap.to(wrapRef.current, {
+        y: -5,
+        duration: 3.2,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+      })
+    }, wrapRef)
     return () => ctx.revert()
   }, [])
 
   return (
-    <span className="globe-o-wrap" aria-hidden="true">
-      <svg ref={globeRef} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ overflow: 'visible' }}>
-        <circle id="globe-glow" cx="50" cy="50" r="46" fill="rgba(212,168,42,0.08)" />
-        <circle cx="50" cy="50" r="44" fill="none" stroke="white" strokeWidth="5" />
-        <g stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none">
-          <ellipse cx="50" cy="50" rx="44" ry="12" />
-          <ellipse cx="50" cy="30" rx="36" ry="9" />
-          <ellipse cx="50" cy="70" rx="36" ry="9" />
-        </g>
-        <g id="meridian-group" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" fill="none">
-          <ellipse cx="50" cy="50" rx="3"  ry="44" />
-          <ellipse cx="50" cy="50" rx="28" ry="44" />
-          <ellipse cx="50" cy="50" rx="28" ry="44" transform="rotate(60,50,50)" />
-        </g>
-        <circle cx="64" cy="34" r="3.5" fill="var(--gold-light)" opacity="0.85" />
-      </svg>
+    <span ref={wrapRef} className="globe-o-wrap" aria-hidden="true">
+      <span ref={glowRef} className="globe-o-glow" />
+      <span ref={ringRef} className="globe-o-ring" />
+      <img
+        ref={imgRef}
+        src="https://image2url.com/r2/default/images/1775735181650-a7f96510-90e2-44e4-b3b7-b413e64c75aa.jpg"
+        alt=""
+        className="globe-o-img"
+        draggable={false}
+      />
     </span>
   )
 }
-
 // ============================================================
 // LOADER
 // ============================================================
