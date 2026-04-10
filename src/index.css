@@ -4,33 +4,33 @@
 
 :root {
   /* BRIGHTENED palette */
---bg-void:      #1e3358;
---bg-deep:      #263d6a;
---bg-navy:      #2e4878;
---bg-card:      rgba(40, 65, 110, 0.92);
+  --bg-void:      #142240;   /* was #0C1628 */
+--bg-deep:      #1a2d4a;   /* was #111E35 */
+--bg-navy:      #203352;   /* was #172540 */
+--bg-card:      rgba(30, 52, 90, 0.92);  /* was rgba(22,38,70,0.92) */
 
---gold:         #E0B830;
---gold-light:   #F7D45A;
---gold-pale:    rgba(224,184,48,0.22);
---gold-border:  rgba(224,184,48,0.55);
+--gold:         #E0B830;   /* was #D4A82A */
+--gold-light:   #F7D45A;   /* was #F2C84B */
+--gold-pale:    rgba(224,184,48,0.22);   /* was 0.16 opacity */
+--gold-border:  rgba(224,184,48,0.55);   /* was 0.4 opacity */
 
---text-bright:  #FFFFFF;
---text-mid:     #EEF4FF;
---text-dim:     #B8D0E8;
---text-muted:   #6E8DA8;
+--text-bright:  #FFFFFF;   /* unchanged */
+--text-mid:     #EEF4FF;   /* was #E8F0FF */
+--text-dim:     #B8D0E8;   /* was #92B4CE — biggest jump, lifts muted text noticeably */
+--text-muted:   #6E8DA8;   /* was #4E6880 */
 
---line:         rgba(212,168,42,0.28);
---white-line:   rgba(255,255,255,0.12);
+  --line:         rgba(212,168,42,0.28);
+  --white-line:   rgba(255,255,255,0.12);
 
---font-display: 'Cormorant Garamond', Georgia, serif;
---font-body:    'Outfit', system-ui, sans-serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Outfit', system-ui, sans-serif;
 
---max-w:        1200px;
---section-pad:  clamp(80px, 10vw, 140px);
---side-pad:     clamp(20px, 5vw, 80px);
+  --max-w:        1200px;
+  --section-pad:  clamp(80px, 10vw, 140px);
+  --side-pad:     clamp(20px, 5vw, 80px);
 
---ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
---ease-in-out:  cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:  cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
