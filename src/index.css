@@ -232,7 +232,7 @@ ul { list-style: none; }
   filter: brightness(1.7) contrast(0.95) saturate(1.3);
   -webkit-mask-image: radial-gradient(circle, black 55%, transparent 72%);
   mask-image: radial-gradient(circle, black 55%, transparent 72%);
-  box-shadow: 0 0 12px rgba(212,168,42,0.2), 0 0 30px rgba(212,168,42,0.08);
+  box-shadow: 0 0 6px rgba(212,168,42,0.2), 0 0 20px rgba(212,168,42,0.08);
 }
 
 .globe-o-glow {
