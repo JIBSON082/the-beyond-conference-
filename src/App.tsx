@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger)
 const AMOUNT_RAISED = 0
 const TOTAL_BUDGET  = 2_400_000
 
-const APPS_SCRIPT_URL: string = 'https://script.google.com/macros/s/AKfycbzIq98TkiWFd-J6ySCOAclkPp-ORSucD9jz1nL7Fdz02oAdFpr_QXQ9apoRDLeLZ1-e/exec'
+const APPS_SCRIPT_URL: string = 'https://script.google.com/macros/s/AKfycbxANrvRvskBbez52jGEVICJ-odav6bl_ynxq6dwGQFOUMyxAhsAfNNND1Qim9xtmKSq/exec'
 
 const LOGO_URL      = 'https://image2url.com/r2/default/images/1775682194312-829bb538-a247-4460-a0a7-1705570be79c.jpg'
 const HERO_IMG      = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
