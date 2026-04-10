@@ -50,6 +50,7 @@ const UNITS = [
 const NAV_SECTIONS = [
   { label: 'Home',                   href: '#home'         },
   { label: 'Our Vision',             href: '#vision'       },
+  { label: 'Registration',           href: '#registration' },
   { label: 'Partnerships & Support', href: '#partnerships' },
   { label: 'Call for Volunteers',    href: '#volunteers'   },
 ]
@@ -534,6 +535,147 @@ function VisionSection() {
     </section>
   )
 }
+
+// ============================================================
+// REGISTRATION
+// ============================================================
+
+function RegistrationSection() {
+  const ref = useRef<HTMLElement>(null)
+  const [form, setForm] = useState({ name: '', email: '', phone: '', faculty: '' })
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 82%' } })
+      gsap.fromTo('.reg-label',   { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.reg-label') })
+      gsap.fromTo('.reg-head',    { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.reg-head') })
+      gsap.fromTo('.reg-intro',   { y:35,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.reg-intro') })
+      gsap.fromTo('.reg-card',    { y:50,opacity:0 }, { y:0,opacity:1,duration:1.1,ease:'power3.out', ...st('.reg-card') })
+    }, ref)
+    return () => ctx.revert()
+  }, [])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleSubmit = async () => {
+    const { name, email, phone, faculty } = form
+    if (!name.trim() || !email.trim() || !phone.trim()) {
+      alert('Please fill in all required fields.')
+      return
+    }
+    setStatus('loading')
+    try {
+      const params = new URLSearchParams({
+        type:    'registration',
+        name:    name.trim(),
+        email:   email.trim(),
+        phone:   phone.trim(),
+        faculty: faculty.trim(),
+      })
+      await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
+      setStatus('success')
+      setForm({ name: '', email: '', phone: '', faculty: '' })
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  return (
+    <section id="registration" ref={ref} className="registration-section">
+      <div className="section-container">
+        <div className="section-label reg-label">02 — Secure Your Seat</div>
+        <h2 className="section-heading reg-head">Register <em>Now</em></h2>
+        <p className="reg-intro">
+          The Beyond Conference 2026 is free to attend — but seats are limited.
+          Fill the form below to confirm your place on <strong>30th May, 2026</strong> at the
+          College of Medicine, LUTH, Lagos.
+        </p>
+
+        <div className="reg-card">
+          {status === 'success' ? (
+            <div className="reg-success">
+              <div className="reg-success-icon">✓</div>
+              <h3>You're Registered!</h3>
+              <p>We've received your details. See you on 30th May 2026 — come ready for <em>MORE</em>.</p>
+              <button className="reg-submit-btn" onClick={() => setStatus('idle')}>
+                Register Another Person
+              </button>
+            </div>
+          ) : (
+            <div className="reg-form">
+              <div className="reg-fields">
+                <div className="reg-field">
+                  <label className="reg-field-label">Full Name <span>*</span></label>
+                  <input
+                    className="reg-input"
+                    type="text"
+                    name="name"
+                    placeholder="Your full name"
+                    value={form.name}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="reg-field">
+                  <label className="reg-field-label">Email Address <span>*</span></label>
+                  <input
+                    className="reg-input"
+                    type="email"
+                    name="email"
+                    placeholder="your@email.com"
+                    value={form.email}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="reg-field">
+                  <label className="reg-field-label">Phone Number <span>*</span></label>
+                  <input
+                    className="reg-input"
+                    type="tel"
+                    name="phone"
+                    placeholder="+234 800 000 0000"
+                    value={form.phone}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="reg-field">
+                  <label className="reg-field-label">Faculty / Department</label>
+                  <input
+                    className="reg-input"
+                    type="text"
+                    name="faculty"
+                    placeholder="e.g. Medicine, Engineering, Law…"
+                    value={form.faculty}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {status === 'error' && (
+                <p className="reg-error">Something went wrong. Please try again.</p>
+              )}
+
+              <button
+                className={`reg-submit-btn ${status === 'loading' ? 'loading' : ''}`}
+                onClick={handleSubmit}
+                disabled={status === 'loading'}
+              >
+                {status === 'loading' ? 'Submitting…' : 'Confirm My Seat →'}
+              </button>
+
+              <p className="reg-note">
+                * Registration is free. Your details are only used for event coordination.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 
 // ============================================================
 // PARTNERSHIPS
