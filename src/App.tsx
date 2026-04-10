@@ -925,7 +925,12 @@ function VolunteersSection() {
               <div className="unit-number" aria-hidden="true">0{i + 1}</div>
               <h3 className="unit-name">{unit.name}</h3>
               <p className="unit-desc">{unit.desc}</p>
-              <button className="join-btn" onClick={() => setActive(unit.name)}>Join Unit</button>
+              <button
+  className="join-btn"
+  onClick={() => window.open(WHATSAPP[unit.name], '_blank', 'noopener,noreferrer')}
+>
+  Join Unit →
+</button>
             </article>
           ))}
         </div>
