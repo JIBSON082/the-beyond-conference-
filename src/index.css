@@ -352,6 +352,165 @@ ul { list-style: none; }
 .vision-closing { font-size: clamp(1rem,1.9vw,1.2rem); color: var(--text-mid); max-width: 720px; line-height: 1.85; border-left: 2px solid var(--gold); padding-left: 28px; }
 
 /* =============================================
+   REGISTRATION
+   ============================================= */
+.registration-section { background: var(--bg-void); position: relative; overflow: hidden; }
+.registration-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 40% at 80% 60%, rgba(212,168,42,0.06) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 50% at 10% 30%, rgba(126,200,227,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.reg-intro {
+  max-width: 620px;
+  font-size: clamp(1rem,1.7vw,1.1rem);
+  color: var(--text-mid);
+  line-height: 1.85;
+  margin-bottom: clamp(40px,6vh,64px);
+  margin-top: -16px;
+}
+.reg-intro strong { color: var(--gold-light); font-weight: 500; }
+
+.reg-card {
+  max-width: 680px;
+  background: var(--bg-card);
+  border: 1px solid var(--gold-border);
+  padding: clamp(32px,5vw,56px);
+  position: relative;
+  overflow: hidden;
+}
+.reg-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, var(--gold), var(--gold-light), var(--gold));
+}
+
+.reg-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+@media (max-width: 560px) { .reg-fields { grid-template-columns: 1fr; } }
+
+.reg-field { display: flex; flex-direction: column; gap: 8px; }
+
+.reg-field-label {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.reg-field-label span { color: var(--gold-light); }
+
+.reg-input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--white-line);
+  color: var(--text-bright);
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  font-weight: 300;
+  outline: none;
+  transition: border-color 0.3s, background 0.3s;
+  width: 100%;
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+.reg-input::placeholder { color: var(--text-muted); }
+.reg-input:focus {
+  border-color: var(--gold-border);
+  background: rgba(212,168,42,0.05);
+}
+
+.reg-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 40px;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold-light);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background 0.35s, color 0.35s, transform 0.3s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.reg-submit-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--gold);
+  transform: translateX(-100%);
+  transition: transform 0.4s var(--ease-out);
+  z-index: 0;
+}
+.reg-submit-btn:hover::before,
+.reg-submit-btn:focus::before { transform: translateX(0); }
+.reg-submit-btn:hover,
+.reg-submit-btn:focus { color: var(--bg-void); transform: translateY(-2px); }
+.reg-submit-btn span,
+.reg-submit-btn { position: relative; z-index: 1; }
+.reg-submit-btn.loading { opacity: 0.6; cursor: not-allowed; }
+.reg-submit-btn:disabled { pointer-events: none; }
+
+.reg-note {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 16px;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+}
+
+.reg-error {
+  color: #f87171;
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+  letter-spacing: 0.04em;
+}
+
+/* Success state */
+.reg-success {
+  text-align: center;
+  padding: clamp(20px,4vw,40px) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.reg-success-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  color: var(--gold-light);
+  margin-bottom: 8px;
+}
+.reg-success h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem,3vw,2.4rem);
+  font-weight: 300;
+  color: var(--text-bright);
+}
+.reg-success p {
+  font-size: clamp(0.95rem,1.5vw,1.05rem);
+  color: var(--text-mid);
+  max-width: 420px;
+  line-height: 1.8;
+}
+.reg-success p em { color: var(--gold-light); font-style: italic; }
+
+/* =============================================
    PARTNERSHIPS
    ============================================= */
 .partnerships-section { background: var(--bg-navy); position: relative; overflow: hidden; }
