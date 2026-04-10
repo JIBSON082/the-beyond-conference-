@@ -999,8 +999,10 @@ export default function App() {
           <HeroSection />
           <div className="gold-line" />
           <VisionSection />
-          <div className="gold-line" />
-          <PartnershipsSection />
+<div className="gold-line" />
+<RegistrationSection />
+<div className="gold-line" />
+<PartnershipsSection />
           <div className="gold-line" />
           <VolunteersSection />
         </main>
