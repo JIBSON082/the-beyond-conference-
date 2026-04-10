@@ -562,10 +562,10 @@ function RegistrationSection() {
 
   const handleSubmit = async () => {
     const { name, email, phone, faculty } = form
-    if (!name.trim() || !email.trim() || !phone.trim()) {
-      alert('Please fill in all required fields.')
-      return
-    }
+   if (!name.trim() || !email.trim() || !phone.trim() || !attending || !mode) {
+  alert('Please fill in all required fields.')
+  return
+}
     setStatus('loading')
     try {
       const params = new URLSearchParams({
