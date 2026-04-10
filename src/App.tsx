@@ -568,16 +568,17 @@ function RegistrationSection() {
 }
     setStatus('loading')
     try {
-      const params = new URLSearchParams({
-        type:    'registration',
-        name:    name.trim(),
-        email:   email.trim(),
-        phone:   phone.trim(),
-        faculty: faculty.trim(),
-      })
+     const params = new URLSearchParams({
+  type:      'registration',
+  name:      form.name.trim(),
+  phone:     form.phone.trim(),
+  email:     form.email.trim(),
+  attending: form.attending,
+  mode:      form.mode,
+})
       await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
       setStatus('success')
-      setForm({ name: '', email: '', phone: '', faculty: '' })
+      setForm({ name: '', phone: '', email: '', attending: '', mode: '' })
     } catch {
       setStatus('error')
     }
