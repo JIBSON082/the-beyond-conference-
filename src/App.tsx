@@ -542,7 +542,7 @@ function VisionSection() {
 
 function RegistrationSection() {
   const ref = useRef<HTMLElement>(null)
-  const [form, setForm] = useState({ name: '', email: '', phone: '', faculty: '' })
+  const [form, setForm] = useState({ name: '', phone: '', email: '', attending: '', mode: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   useEffect(() => {
@@ -606,52 +606,71 @@ function RegistrationSection() {
             </div>
           ) : (
             <div className="reg-form">
-              <div className="reg-fields">
-                <div className="reg-field">
-                  <label className="reg-field-label">Full Name <span>*</span></label>
-                  <input
-                    className="reg-input"
-                    type="text"
-                    name="name"
-                    placeholder="Your full name"
-                    value={form.name}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="reg-field">
-                  <label className="reg-field-label">Email Address <span>*</span></label>
-                  <input
-                    className="reg-input"
-                    type="email"
-                    name="email"
-                    placeholder="your@email.com"
-                    value={form.email}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="reg-field">
-                  <label className="reg-field-label">Phone Number <span>*</span></label>
-                  <input
-                    className="reg-input"
-                    type="tel"
-                    name="phone"
-                    placeholder="+234 800 000 0000"
-                    value={form.phone}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="reg-field">
-                  <label className="reg-field-label">Faculty / Department</label>
-                  <input
-                    className="reg-input"
-                    type="text"
-                    name="faculty"
-                    placeholder="e.g. Medicine, Engineering, Law…"
-                    value={form.faculty}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
+             <div className="reg-fields">
+  <div className="reg-field">
+    <label className="reg-field-label">Full Name <span>*</span></label>
+    <input
+      className="reg-input"
+      type="text"
+      name="name"
+      placeholder="Your full name"
+      value={form.name}
+      onChange={handleChange}
+    />
+  </div>
+
+  <div className="reg-field">
+    <label className="reg-field-label">Phone Number <span>*</span></label>
+    <input
+      className="reg-input"
+      type="tel"
+      name="phone"
+      placeholder="+234 800 000 0000"
+      value={form.phone}
+      onChange={handleChange}
+    />
+  </div>
+
+  <div className="reg-field">
+    <label className="reg-field-label">Email Address <span>*</span></label>
+    <input
+      className="reg-input"
+      type="email"
+      name="email"
+      placeholder="your@email.com"
+      value={form.email}
+      onChange={handleChange}
+    />
+  </div>
+
+  <div className="reg-field">
+    <label className="reg-field-label">Will you be attending? <span>*</span></label>
+    <select
+      className="reg-input reg-select"
+      name="attending"
+      value={form.attending}
+      onChange={handleChange}
+    >
+      <option value="" disabled>Select an option</option>
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+  </div>
+
+  <div className="reg-field">
+    <label className="reg-field-label">Virtual or Physical? <span>*</span></label>
+    <select
+      className="reg-input reg-select"
+      name="mode"
+      value={form.mode}
+      onChange={handleChange}
+    >
+      <option value="" disabled>Select an option</option>
+      <option value="Physical">Physical</option>
+      <option value="Virtual">Virtual</option>
+    </select>
+  </div>
+</div>
 
               {status === 'error' && (
                 <p className="reg-error">Something went wrong. Please try again.</p>
@@ -665,8 +684,7 @@ function RegistrationSection() {
                 {status === 'loading' ? 'Submitting…' : 'Confirm My Seat →'}
               </button>
 
-              <p className="reg-note">
-                * Registration is free. Your details are only used for event coordination.
+              <p className="reg-note"
               </p>
             </div>
           )}
