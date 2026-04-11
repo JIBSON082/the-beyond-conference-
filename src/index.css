@@ -510,6 +510,11 @@ ul { list-style: none; }
 }
 .reg-success p em { color: var(--gold-light); font-style: italic; }
 
+.reg-select option {
+  background: var(--bg-deep);
+  color: var(--text-bright);
+}
+
 /* =============================================
    PARTNERSHIPS
    ============================================= */
