@@ -686,7 +686,6 @@ function RegistrationSection() {
               </button>
 
              <p className="reg-note">* Registration is free. Your details are only used for event coordination.</p>
-              </p>
             </div>
           )}
         </div>
