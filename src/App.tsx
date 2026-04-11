@@ -685,8 +685,7 @@ function RegistrationSection() {
                 {status === 'loading' ? 'Submitting…' : 'Confirm My Seat →'}
               </button>
 
-            <p className="reg-note">*
-</p>
+            <p className="reg-note">* </p>
             </div>
           )}
         </div>
