@@ -548,10 +548,10 @@ function RegistrationSection() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 82%' } })
-      gsap.fromTo('.reg-label',   { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.reg-label') })
-      gsap.fromTo('.reg-head',    { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.reg-head') })
-      gsap.fromTo('.reg-intro',   { y:35,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.reg-intro') })
-      gsap.fromTo('.reg-card',    { y:50,opacity:0 }, { y:0,opacity:1,duration:1.1,ease:'power3.out', ...st('.reg-card') })
+      gsap.fromTo('.reg-label', { y:40,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.reg-label') })
+      gsap.fromTo('.reg-head',  { y:60,opacity:0 }, { y:0,opacity:1,duration:1.2,ease:'power3.out', ...st('.reg-head') })
+      gsap.fromTo('.reg-intro', { y:35,opacity:0 }, { y:0,opacity:1,duration:1, ...st('.reg-intro') })
+      gsap.fromTo('.reg-card',  { y:50,opacity:0 }, { y:0,opacity:1,duration:1.1,ease:'power3.out', ...st('.reg-card') })
     }, ref)
     return () => ctx.revert()
   }, [])
@@ -561,21 +561,21 @@ function RegistrationSection() {
   }
 
   const handleSubmit = async () => {
-    const { name, email, phone, faculty } = form
-   if (!name.trim() || !email.trim() || !phone.trim() || !attending || !mode) {
-  alert('Please fill in all required fields.')
-  return
-}
+    const { name, phone, email, attending, mode } = form
+    if (!name.trim() || !phone.trim() || !email.trim() || !attending || !mode) {
+      alert('Please fill in all required fields.')
+      return
+    }
     setStatus('loading')
     try {
-     const params = new URLSearchParams({
-  type:      'registration',
-  name:      form.name.trim(),
-  phone:     form.phone.trim(),
-  email:     form.email.trim(),
-  attending: form.attending,
-  mode:      form.mode,
-})
+      const params = new URLSearchParams({
+        type:      'registration',
+        name:      name.trim(),
+        phone:     phone.trim(),
+        email:     email.trim(),
+        attending,
+        mode,
+      })
       await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
       setStatus('success')
       setForm({ name: '', phone: '', email: '', attending: '', mode: '' })
@@ -607,71 +607,36 @@ function RegistrationSection() {
             </div>
           ) : (
             <div className="reg-form">
-             <div className="reg-fields">
-  <div className="reg-field">
-    <label className="reg-field-label">Full Name <span>*</span></label>
-    <input
-      className="reg-input"
-      type="text"
-      name="name"
-      placeholder="Your full name"
-      value={form.name}
-      onChange={handleChange}
-    />
-  </div>
-
-  <div className="reg-field">
-    <label className="reg-field-label">Phone Number <span>*</span></label>
-    <input
-      className="reg-input"
-      type="tel"
-      name="phone"
-      placeholder="+234 800 000 0000"
-      value={form.phone}
-      onChange={handleChange}
-    />
-  </div>
-
-  <div className="reg-field">
-    <label className="reg-field-label">Email Address <span>*</span></label>
-    <input
-      className="reg-input"
-      type="email"
-      name="email"
-      placeholder="your@email.com"
-      value={form.email}
-      onChange={handleChange}
-    />
-  </div>
-
-  <div className="reg-field">
-    <label className="reg-field-label">Will you be attending? <span>*</span></label>
-    <select
-      className="reg-input reg-select"
-      name="attending"
-      value={form.attending}
-      onChange={handleChange}
-    >
-      <option value="" disabled>Select an option</option>
-      <option value="Yes">Yes</option>
-      <option value="No">No</option>
-    </select>
-  </div>
-
-  <div className="reg-field">
-    <label className="reg-field-label">Virtual or Physical? <span>*</span></label>
-    <select
-      className="reg-input reg-select"
-      name="mode"
-      value={form.mode}
-      onChange={handleChange}
-    >
-      <option value="" disabled>Select an option</option>
-      <option value="Physical">Physical</option>
-      <option value="Virtual">Virtual</option>
-    </select>
-  </div>
-</div>
+              <div className="reg-fields">
+                <div className="reg-field">
+                  <label className="reg-field-label">Full Name <span>*</span></label>
+                  <input className="reg-input" type="text" name="name" placeholder="Your full name" value={form.name} onChange={handleChange} />
+                </div>
+                <div className="reg-field">
+                  <label className="reg-field-label">Phone Number <span>*</span></label>
+                  <input className="reg-input" type="tel" name="phone" placeholder="+234 800 000 0000" value={form.phone} onChange={handleChange} />
+                </div>
+                <div className="reg-field">
+                  <label className="reg-field-label">Email Address <span>*</span></label>
+                  <input className="reg-input" type="email" name="email" placeholder="your@email.com" value={form.email} onChange={handleChange} />
+                </div>
+                <div className="reg-field">
+                  <label className="reg-field-label">Will you be attending? <span>*</span></label>
+                  <select className="reg-input reg-select" name="attending" value={form.attending} onChange={handleChange}>
+                    <option value="" disabled>Select an option</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+                <div className="reg-field">
+                  <label className="reg-field-label">Virtual or Physical? <span>*</span></label>
+                  <select className="reg-input reg-select" name="mode" value={form.mode} onChange={handleChange}>
+                    <option value="" disabled>Select an option</option>
+                    <option value="Physical">Physical</option>
+                    <option value="Virtual">Virtual</option>
+                  </select>
+                </div>
+              </div>
 
               {status === 'error' && (
                 <p className="reg-error">Something went wrong. Please try again.</p>
@@ -685,7 +650,7 @@ function RegistrationSection() {
                 {status === 'loading' ? 'Submitting…' : 'Confirm My Seat →'}
               </button>
 
-            <p className="reg-note">* </p>
+              <p className="reg-note">* Registration is free. Your details are only used for event coordination.</p>
             </div>
           )}
         </div>
