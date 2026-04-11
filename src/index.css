@@ -197,7 +197,7 @@ ul { list-style: none; }
 /* Hero title with animated O */
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 9vw, 8.5rem);
+  font-size: clamp(2.8rem, 7vw, 6.5rem);
   font-weight: 300;
   letter-spacing: -0.02em;
   color: #FFFFFF;
