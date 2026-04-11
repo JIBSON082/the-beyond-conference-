@@ -560,30 +560,24 @@ function RegistrationSection() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const handleSubmit = async () => {
+ const handleSubmit = () => {
     const { name, phone, email, attending, mode } = form
     if (!name.trim() || !phone.trim() || !email.trim() || !attending || !mode) {
       alert('Please fill in all required fields.')
       return
     }
-    setStatus('loading')
-    try {
-      const params = new URLSearchParams({
-        type:      'registration',
-        name:      name.trim(),
-        phone:     phone.trim(),
-        email:     email.trim(),
-        attending,
-        mode,
-      })
-      await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
-      setStatus('success')
-      setForm({ name: '', phone: '', email: '', attending: '', mode: '' })
-    } catch {
-      setStatus('error')
-    }
+    const params = new URLSearchParams({
+      type:      'registration',
+      name:      name.trim(),
+      phone:     phone.trim(),
+      email:     email.trim(),
+      attending,
+      mode,
+    })
+    setStatus('success')
+    setForm({ name: '', phone: '', email: '', attending: '', mode: '' })
+    fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
   }
-
   return (
     <section id="registration" ref={ref} className="registration-section">
       <div className="section-container">
