@@ -446,18 +446,8 @@ ul { list-style: none; }
   overflow: hidden;
   margin-top: 8px;
 }
-.reg-submit-btn::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: var(--gold);
-  transform: translateX(-100%);
-  transition: transform 0.4s var(--ease-out);
-  z-index: 0;
-}
-.reg-submit-btn:hover::before,
-.reg-submit-btn:focus::before { transform: translateX(0); }
 .reg-submit-btn:hover,
-.reg-submit-btn:focus { color: var(--bg-void); transform: translateY(-2px); }
+.reg-submit-btn:focus { opacity: 0.85; transform: translateY(-2px); }
 .reg-submit-btn span,
 .reg-submit-btn { position: relative; z-index: 1; }
 .reg-submit-btn.loading { opacity: 0.6; cursor: not-allowed; }
