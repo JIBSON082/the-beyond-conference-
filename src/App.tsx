@@ -685,7 +685,7 @@ function RegistrationSection() {
                 {status === 'loading' ? 'Submitting…' : 'Confirm My Seat →'}
               </button>
 
-              <p className="reg-note">* Registration is free. Your details are only used for event coordination.</p>
+             <p className="reg-note">* Registration is free. Your details are only used for event coordination.</p>
               </p>
             </div>
           )}
