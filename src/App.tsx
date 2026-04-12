@@ -151,7 +151,7 @@ function GlobeO() {
       <span ref={ringRef} className="globe-o-ring" />
       <img
         ref={imgRef}
-        src="https://image2url.com/r2/default/images/1775735181650-a7f96510-90e2-44e4-b3b7-b413e64c75aa.jpg"
+        src="/3pyv4fjzfhrmt0cxg3n9fq7yng_result_0.png"
         alt=""
         className="globe-o-img"
         draggable={false}
