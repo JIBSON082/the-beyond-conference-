@@ -12,7 +12,7 @@ const AMOUNT_RAISED = 0
 const TOTAL_BUDGET  = 2_400_000
 
 const APPS_SCRIPT_URL: string = 'https://script.google.com/macros/s/AKfycbxANrvRvskBbez52jGEVICJ-odav6bl_ynxq6dwGQFOUMyxAhsAfNNND1Qim9xtmKSq/exec'
-const LOGO_URL      = 'https://image2url.com/r2/bucket3/images/1775981883023-021dd8e9-0051-499b-95bc-26004c7ba49e.jpg'
+const LOGO_URL      = '20251004_230247.jpg'
 const HERO_IMG      = 'https://image2url.com/r2/default/images/1775647110507-bd853ef1-65d6-4a71-993f-a430334b9479.jpg'
 const INSTAGRAM_URL = 'https://www.instagram.com/the_beyond_community?igsh=eDVtdGpvM3B3bTF5'
 
