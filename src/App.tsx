@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger)
 // ============================================================
 
 const AMOUNT_RAISED = 0
-const TOTAL_BUDGET  = 2_400_000
+const TOTAL_BUDGET  = 2_600_000
 
 const APPS_SCRIPT_URL: string = 'https://script.google.com/macros/s/AKfycbxANrvRvskBbez52jGEVICJ-odav6bl_ynxq6dwGQFOUMyxAhsAfNNND1Qim9xtmKSq/exec'
 const LOGO_URL      = '/20251004_230247.jpg'
