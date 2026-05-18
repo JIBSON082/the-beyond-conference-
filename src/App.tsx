@@ -268,25 +268,7 @@ function Navbar() {
           paddingBottom: '40px',
         }}
       >
-        {/* Close button */}
-        <button
-          onClick={() => setOpen(false)}
-          style={{
-            position: 'absolute',
-            top: '28px',
-            right: '24px',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'rgba(212,168,42,0.7)',
-            fontSize: '1.4rem',
-            fontWeight: 200,
-            lineHeight: 1,
-          }}
-          aria-label="Close menu"
-        >
-          ✕
-        </button>
+        
 
         {/* Nav links */}
         <div
@@ -322,21 +304,23 @@ function Navbar() {
             >
               <span style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 'clamp(22px, 6vw, 30px)',
+                fontSize: 'clamp(28px, 8vw, 42px)',
                 color: 'rgba(255,255,255,0.88)',
                 fontWeight: 300,
                 letterSpacing: '0.02em',
               }}>
                 {s.label}
               </span>
-              <span style={{
-                color: 'rgba(212,168,42,0.5)',
-                fontSize: '1.2rem',
-                fontWeight: 200,
-                lineHeight: 1,
-              }}>
-                ›
-              </span>
+             <span style={{
+  color: 'rgba(212,168,42,0.5)',
+  fontSize: '1.2rem',
+  fontWeight: 200,
+  lineHeight: 1,
+  flexShrink: 0,
+  marginLeft: '12px',
+}}>
+  ›
+</span>
             </button>
           ))}
         </div>
