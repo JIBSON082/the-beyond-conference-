@@ -258,24 +258,6 @@ function Navbar() {
 // ============================================================
 
 function HeroSection() {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-useEffect(() => {
-  const target = new Date("2026-05-30T00:00:00").getTime();
-  const tick = () => {
-    const now = Date.now();
-    const diff = Math.max(0, target - now);
-    setTimeLeft({
-      days:    Math.floor(diff / (1000 * 60 * 60 * 24)),
-      hours:   Math.floor((diff / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((diff / (1000 * 60)) % 60),
-      seconds: Math.floor((diff / 1000) % 60),
-    });
-  };
-  tick();
-  const iv = setInterval(tick, 1000);
-  return () => clearInterval(iv);
-}, []);
   const heroRef      = useRef<HTMLElement>(null)
   const bgRef        = useRef<HTMLDivElement>(null)
   const eyebrowRef   = useRef<HTMLDivElement>(null)
@@ -496,63 +478,123 @@ useEffect(() => {
         </div>
       </div>
 
-<div style={{
-  marginTop: "48px",
-  display: "flex",
-  gap: "clamp(16px, 4vw, 32px)",
-  justifyContent: "center",
-  alignItems: "flex-end",
-}}>
-  {[
-    { value: timeLeft.days,    label: "Days"    },
-    { value: timeLeft.hours,   label: "Hours"   },
-    { value: timeLeft.minutes, label: "Minutes" },
-    { value: timeLeft.seconds, label: "Seconds" },
-  ].map((item, i) => (
-    <div key={item.label} style={{ textAlign: "center", position: "relative" }}>
-      <div style={{
-        fontFamily: "'Cormorant Garamond', 'Times New Roman', serif",
-        fontSize: "clamp(44px, 10vw, 80px)",
-        fontWeight: 300,
-        lineHeight: 1,
-        color: "#D4A82A",
-        letterSpacing: "-0.02em",
-        minWidth: "clamp(52px, 12vw, 96px)",
-        textAlign: "center",
-      }}>
-        {String(item.value).padStart(2, "0")}
-      </div>
-      <div style={{
-        fontFamily: "'DM Sans', sans-serif",
-        fontSize: "0.55rem",
-        letterSpacing: "0.35em",
-        color: "rgba(255,255,255,0.35)",
-        textTransform: "uppercase",
-        marginTop: "6px",
-      }}>
-        {item.label}
-      </div>
-      {i < 3 && (
-        <div style={{
-          position: "absolute",
-          right: "clamp(-14px, -3vw, -20px)",
-          top: "clamp(10px, 2vw, 18px)",
-          color: "rgba(212,168,42,0.4)",
-          fontSize: "clamp(24px, 5vw, 40px)",
-          fontWeight: 200,
-          lineHeight: 1,
-        }}>:</div>
-      )}
-    </div>
-  ))}
-</div>
-
       <div className="hero-scroll-cue" aria-hidden="true">
         <span>Scroll</span>
         <div className="scroll-line" />
       </div>
     </section>
   )
+}
+
+
+
+function CountdownSection() {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0, hours: 0, minutes: 0, seconds: 0
+  });
+
+  useEffect(() => {
+    const target = new Date("2026-05-30T00:00:00").getTime();
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now());
+      setTimeLeft({
+        days:    Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours:   Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
+    };
+    tick();
+    const iv = setInterval(tick, 1000);
+    return () => clearInterval(iv);
+  }, []);
+
+  const units = [
+    { value: timeLeft.days,    label: "Days"    },
+    { value: timeLeft.hours,   label: "Hours"   },
+    { value: timeLeft.minutes, label: "Minutes" },
+    { value: timeLeft.seconds, label: "Seconds" },
+  ];
+
+  return (
+    <section style={{
+      background: "linear-gradient(180deg, #0a0f1e 0%, #0d1529 60%, #0a0f1e 100%)",
+      padding: "64px 24px",
+      textAlign: "center",
+      borderTop: "1px solid rgba(212,168,42,0.1)",
+      position: "relative",
+      overflow: "hidden",
+    }}>
+
+      {/* Ambient glow */}
+      <div style={{
+        position: "absolute",
+        top: "50%", left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "500px", height: "200px",
+        background: "radial-gradient(ellipse, rgba(212,168,42,0.06) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
+
+      {/* Boxes */}
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "clamp(6px, 2vw, 14px)",
+        maxWidth: "580px",
+        margin: "0 auto",
+      }}>
+        {units.map((unit, i) => (
+          <div key={unit.label} style={{ display: "flex", alignItems: "center", gap: "clamp(6px, 2vw, 14px)" }}>
+
+            <div style={{
+              background: "linear-gradient(135deg, rgba(212,168,42,0.1) 0%, rgba(212,168,42,0.03) 100%)",
+              border: "1px solid rgba(212,168,42,0.22)",
+              borderRadius: "6px",
+              padding: "clamp(14px, 3vw, 22px) clamp(10px, 2.5vw, 18px)",
+              minWidth: "clamp(62px, 16vw, 108px)",
+              boxShadow: "0 0 24px rgba(212,168,42,0.05), inset 0 1px 0 rgba(255,255,255,0.04)",
+            }}>
+              <div style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: "clamp(42px, 11vw, 76px)",
+                fontWeight: 300,
+                lineHeight: 1,
+                color: "#D4A82A",
+                letterSpacing: "-0.02em",
+                textShadow: "0 0 32px rgba(212,168,42,0.35)",
+              }}>
+                {String(unit.value).padStart(2, "0")}
+              </div>
+              <div style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "0.5rem",
+                letterSpacing: "0.38em",
+                color: "rgba(255,255,255,0.28)",
+                textTransform: "uppercase",
+                marginTop: "8px",
+              }}>
+                {unit.label}
+              </div>
+            </div>
+
+            {i < 3 && (
+              <div style={{
+                color: "rgba(212,168,42,0.3)",
+                fontSize: "clamp(22px, 6vw, 42px)",
+                fontWeight: 200,
+                lineHeight: 1,
+                fontFamily: "'Cormorant Garamond', serif",
+                marginBottom: "18px",
+              }}>:</div>
+            )}
+          </div>
+        ))}
+      </div>
+
+    </section>
+  );
 }
 
 // ============================================================
@@ -1095,19 +1137,20 @@ export default function App() {
     <>
       {!loaded && <Loader onDone={() => setLoaded(true)} />}
       <div style={{ visibility: loaded ? 'visible' : 'hidden' }}>
-        <Navbar />
-        <main>
-          <HeroSection />
-          <div className="gold-line" />
-          <VisionSection />
-<div className="gold-line" />
-<RegistrationSection />
-<div className="gold-line" />
-<PartnershipsSection />
-          <div className="gold-line" />
-          <VolunteersSection />
-        </main>
-        <Footer />
+       <Navbar />
+<main>
+  <HeroSection />
+  <CountdownSection />
+  <div className="gold-line" />
+  <VisionSection />
+  <div className="gold-line" />
+  <RegistrationSection />
+  <div className="gold-line" />
+  <PartnershipsSection />
+  <div className="gold-line" />
+  <VolunteersSection />
+</main>
+<Footer />
       </div>
     </>
   )
