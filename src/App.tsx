@@ -332,9 +332,11 @@ function Navbar() {
           marginTop: '24px',
         }}>
           <p style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '0.75rem',
-            letterSpacing: '0.25em',
+            fontFamily: "'Cormorant Garamond', serif",
+              fontSize: '1.15rem',
+              fontStyle: 'italic',
+              fontWeight: '400',
+              letterSpacing: '0.15em',
             color: 'rgba(255,255,255,0.2)',
             textTransform: 'uppercase',
             marginBottom: '10px',
