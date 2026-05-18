@@ -660,17 +660,50 @@ function RegistrationSection() {
 // ============================================================
 
 function PartnershipsSection() {
-  const ref     = useRef<HTMLElement>(null)
-  const fillRef = useRef<HTMLDivElement>(null)
-  const [copied, setCopied] = useState<string | null>(null)
+  const ref        = useRef<HTMLElement>(null)
+  const fillRef    = useRef<HTMLDivElement>(null)
+  const [copied, setCopied]         = useState<string | null>(null)
+  const [displayAmount, setDisplayAmount] = useState(0)
+  const [hasAnimated, setHasAnimated]     = useState(false)
+
   const pct = Math.min((AMOUNT_RAISED / TOTAL_BUDGET) * 100, 100)
 
   const copy = (val: string, label: string) => {
     navigator.clipboard.writeText(val).then(() => {
-      setCopied(label); setTimeout(() => setCopied(null), 2200)
+      setCopied(label)
+      setTimeout(() => setCopied(null), 2200)
     })
   }
 
+  // Count-up on scroll into view
+  useEffect(() => {
+    if (hasAnimated) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasAnimated(true)
+          const duration = 2400
+          const steps = 80
+          const interval = duration / steps
+          let step = 0
+          const timer = setInterval(() => {
+            step++
+            const ease = 1 - Math.pow(1 - step / steps, 3)
+            setDisplayAmount(Math.floor(ease * AMOUNT_RAISED))
+            if (step >= steps) {
+              clearInterval(timer)
+              setDisplayAmount(AMOUNT_RAISED)
+            }
+          }, interval)
+        }
+      },
+      { threshold: 0.4 }
+    )
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [hasAnimated])
+
+  // GSAP animations
   useEffect(() => {
     const ctx = gsap.context(() => {
       const st = (t: string) => ({ scrollTrigger: { trigger: t, start: 'top 82%' } })
@@ -688,27 +721,45 @@ function PartnershipsSection() {
       <div className="section-container">
         <div className="section-label p-label">02 — Call for Support</div>
         <h2 className="section-heading p-head">Partnerships<br />&amp; <em>Support</em></h2>
+
         <div className="partnerships-grid">
+
+          {/* Left column */}
           <div>
             <p className="column-heading">Support Needed</p>
             <ul className="support-list">
-              {['Financial Sponsorship','Souvenir Production Support','Media Coverage','Refreshments Sponsorship','Equipment Sponsorship'].map(item => (
+              {[
+                'Financial Sponsorship',
+                'Souvenir Production Support',
+                'Media Coverage',
+                'Refreshments Sponsorship',
+                'Equipment Sponsorship',
+              ].map(item => (
                 <li key={item} className="support-item">{item}</li>
               ))}
             </ul>
           </div>
+
+          {/* Right column */}
           <div>
             <p className="column-heading">Financial Goal</p>
+
             <div style={{ marginBottom: '32px' }}>
               <div className="progress-amounts">
-                <span className="amount-raised">{formatNaira(AMOUNT_RAISED)}</span>
+                {/* Count-up amount */}
+                <span className="amount-raised">
+                  {formatNaira(displayAmount)}
+                </span>
                 <span className="amount-total">of {formatNaira(TOTAL_BUDGET)}</span>
               </div>
+
               <div className="progress-track">
                 <div ref={fillRef} className="progress-fill" style={{ width: '0%' }} />
               </div>
+
               <p className="progress-percentage">{pct.toFixed(1)}% of total goal reached</p>
             </div>
+
             <div className="account-card">
               <p className="account-label">Donate Directly</p>
               {[
@@ -717,18 +768,21 @@ function PartnershipsSection() {
                 { label: 'Account Name',   val: ACCOUNT.name   },
               ].map(({ label, val }) => (
                 <div
-                  key={label} className="account-row"
+                  key={label}
+                  className="account-row"
                   onClick={() => copy(val, label)}
-                  role="button" tabIndex={0}
+                  role="button"
+                  tabIndex={0}
                   onKeyDown={e => e.key === 'Enter' && copy(val, label)}
                 >
                   <span className="account-field-label">{label}</span>
                   <span className="account-value">{val}</span>
-                  <span className="copy-btn">{copied === label ? 'Copied' : 'Copy'}</span>
+                  <span className="copy-btn">{copied === label ? 'Copied ✓' : 'Copy'}</span>
                 </div>
               ))}
             </div>
           </div>
+
         </div>
       </div>
     </section>
