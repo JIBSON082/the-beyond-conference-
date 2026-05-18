@@ -198,20 +198,34 @@ function Navbar() {
 
   useEffect(() => {
     if (open) {
-      gsap.to(overlayRef.current, { duration: 0.7, clipPath: 'circle(170% at 95% 5%)', ease: 'power3.inOut' })
+      gsap.to(overlayRef.current, {
+        duration: 0.7,
+        clipPath: 'circle(170% at 95% 5%)',
+        ease: 'power3.inOut'
+      })
       gsap.fromTo(
         linksRef.current ? Array.from(linksRef.current.children) : [],
-        { y: 70, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.09, delay: 0.35, duration: 0.8, ease: 'power3.out' }
+        { x: -20, opacity: 0 },
+        { x: 0, opacity: 1, stagger: 0.07, delay: 0.3, duration: 0.6, ease: 'power3.out' }
       )
     } else {
-      gsap.to(overlayRef.current, { duration: 0.55, clipPath: 'circle(0% at 95% 5%)', ease: 'power3.inOut' })
+      gsap.to(overlayRef.current, {
+        duration: 0.55,
+        clipPath: 'circle(0% at 95% 5%)',
+        ease: 'power3.inOut'
+      })
     }
   }, [open])
 
   const navigate = useCallback((href: string) => {
     setOpen(false)
-    setTimeout(() => document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' }), 650)
+    setTimeout(() => {
+      if (href === '#home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } else {
+        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 650)
   }, [])
 
   return (
@@ -240,13 +254,127 @@ function Navbar() {
         </button>
       </nav>
 
-      <div ref={overlayRef} className="nav-overlay" style={{ clipPath: 'circle(0% at 95% 5%)' }}>
-        <div ref={linksRef} className="nav-links">
-          {NAV_SECTIONS.map(s => (
-            <button key={s.href} className="nav-link-item" onClick={() => navigate(s.href)}>
-              {s.label}
+      {/* ── Overlay ── */}
+      <div
+        ref={overlayRef}
+        className="nav-overlay"
+        style={{
+          clipPath: 'circle(0% at 95% 5%)',
+          background: '#0a0f1e',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          paddingTop: '100px',
+          paddingBottom: '40px',
+        }}
+      >
+        {/* Close button */}
+        <button
+          onClick={() => setOpen(false)}
+          style={{
+            position: 'absolute',
+            top: '28px',
+            right: '24px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'rgba(212,168,42,0.7)',
+            fontSize: '1.4rem',
+            fontWeight: 200,
+            lineHeight: 1,
+          }}
+          aria-label="Close menu"
+        >
+          ✕
+        </button>
+
+        {/* Nav links */}
+        <div
+          ref={linksRef}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '0 32px',
+          }}
+        >
+          {NAV_SECTIONS.map((s, i) => (
+            <button
+              key={s.href}
+              onClick={() => navigate(s.href)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '22px 0',
+                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                background: 'none',
+                border_bottom: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                width: '100%',
+                borderTop: 'none',
+                borderLeft: 'none',
+                borderRight: 'none',
+                borderBottomWidth: '1px',
+                borderBottomStyle: 'solid',
+                borderBottomColor: 'rgba(255,255,255,0.08)',
+              }}
+            >
+              <span style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: 'clamp(22px, 6vw, 30px)',
+                color: 'rgba(255,255,255,0.88)',
+                fontWeight: 300,
+                letterSpacing: '0.02em',
+              }}>
+                {s.label}
+              </span>
+              <span style={{
+                color: 'rgba(212,168,42,0.5)',
+                fontSize: '1.2rem',
+                fontWeight: 200,
+                lineHeight: 1,
+              }}>
+                ›
+              </span>
             </button>
           ))}
+        </div>
+
+        {/* Bottom CTA */}
+        <div style={{
+          padding: '28px 32px 0',
+          borderTop: '1px solid rgba(212,168,42,0.1)',
+          marginTop: '24px',
+        }}>
+          <p style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: '0.55rem',
+            letterSpacing: '0.4em',
+            color: 'rgba(255,255,255,0.2)',
+            textTransform: 'uppercase',
+            marginBottom: '10px',
+          }}>
+            30th May, 2026 · Lagos
+          </p>
+          <button
+            onClick={() => navigate('#registration')}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '0.65rem',
+              letterSpacing: '0.35em',
+              color: '#D4A82A',
+              textTransform: 'uppercase',
+              borderBottom: '1px solid rgba(212,168,42,0.35)',
+              paddingBottom: '2px',
+            }}
+          >
+            Register Now
+          </button>
         </div>
       </div>
     </>
