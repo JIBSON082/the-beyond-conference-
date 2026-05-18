@@ -308,7 +308,7 @@ function Navbar() {
                 padding: '22px 0',
                 borderBottom: '1px solid rgba(255,255,255,0.08)',
                 background: 'none',
-                border_bottom: 'none',
+                
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
