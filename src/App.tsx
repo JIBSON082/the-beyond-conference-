@@ -329,7 +329,7 @@ function Navbar() {
         <div style={{
           padding: '28px 32px 0',
           borderTop: '1px solid rgba(212,168,42,0.1)',
-          marginTop: '24px',
+          marginTop: '12px',
         }}>
           <p style={{
             fontFamily: "'Cormorant Garamond', serif",
