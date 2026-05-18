@@ -323,45 +323,7 @@ function Navbar() {
 </span>
             </button>
           ))}
-        </div>
-
-        {/* Bottom CTA */}
-        <div style={{
-          padding: '28px 32px 0',
-          borderTop: '1px solid rgba(212,168,42,0.1)',
-          marginTop: '12px',
-        }}>
-          <p style={{
-            fontFamily: "'Cormorant Garamond', serif",
-              fontSize: '1.15rem',
-              fontStyle: 'italic',
-              fontWeight: '400',
-              letterSpacing: '0.15em',
-            color: 'rgba(255,255,255,0.2)',
-            textTransform: 'uppercase',
-            marginBottom: '10px',
-          }}>
-            30th May, 2026 · Lagos
-          </p>
-          <button
-            onClick={() => navigate('#registration')}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 0,
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '0.95rem',
-              letterSpacing: '0.25em',
-              color: '#D4A82A',
-              textTransform: 'uppercase',
-              borderBottom: '1px solid rgba(212,168,42,0.35)',
-              paddingBottom: '2px',
-            }}
-          >
-            Register Now
-          </button>
-        </div>
+        </div> 
       </div>
     </>
   )
