@@ -333,8 +333,8 @@ function Navbar() {
         }}>
           <p style={{
             fontFamily: "'DM Sans', sans-serif",
-            fontSize: '0.55rem',
-            letterSpacing: '0.4em',
+            fontSize: '0.75rem',
+            letterSpacing: '0.25em',
             color: 'rgba(255,255,255,0.2)',
             textTransform: 'uppercase',
             marginBottom: '10px',
@@ -349,8 +349,8 @@ function Navbar() {
               cursor: 'pointer',
               padding: 0,
               fontFamily: "'DM Sans', sans-serif",
-              fontSize: '0.65rem',
-              letterSpacing: '0.35em',
+              fontSize: '0.95rem',
+              letterSpacing: '0.25em',
               color: '#D4A82A',
               textTransform: 'uppercase',
               borderBottom: '1px solid rgba(212,168,42,0.35)',
