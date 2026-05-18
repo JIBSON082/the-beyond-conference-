@@ -258,6 +258,24 @@ function Navbar() {
 // ============================================================
 
 function HeroSection() {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+useEffect(() => {
+  const target = new Date("2026-05-30T00:00:00").getTime();
+  const tick = () => {
+    const now = Date.now();
+    const diff = Math.max(0, target - now);
+    setTimeLeft({
+      days:    Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours:   Math.floor((diff / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((diff / (1000 * 60)) % 60),
+      seconds: Math.floor((diff / 1000) % 60),
+    });
+  };
+  tick();
+  const iv = setInterval(tick, 1000);
+  return () => clearInterval(iv);
+}, []);
   const heroRef      = useRef<HTMLElement>(null)
   const bgRef        = useRef<HTMLDivElement>(null)
   const eyebrowRef   = useRef<HTMLDivElement>(null)
@@ -477,6 +495,57 @@ function HeroSection() {
           </div>
         </div>
       </div>
+
+<div style={{
+  marginTop: "48px",
+  display: "flex",
+  gap: "clamp(16px, 4vw, 32px)",
+  justifyContent: "center",
+  alignItems: "flex-end",
+}}>
+  {[
+    { value: timeLeft.days,    label: "Days"    },
+    { value: timeLeft.hours,   label: "Hours"   },
+    { value: timeLeft.minutes, label: "Minutes" },
+    { value: timeLeft.seconds, label: "Seconds" },
+  ].map((item, i) => (
+    <div key={item.label} style={{ textAlign: "center", position: "relative" }}>
+      <div style={{
+        fontFamily: "'Cormorant Garamond', 'Times New Roman', serif",
+        fontSize: "clamp(44px, 10vw, 80px)",
+        fontWeight: 300,
+        lineHeight: 1,
+        color: "#D4A82A",
+        letterSpacing: "-0.02em",
+        minWidth: "clamp(52px, 12vw, 96px)",
+        textAlign: "center",
+      }}>
+        {String(item.value).padStart(2, "0")}
+      </div>
+      <div style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: "0.55rem",
+        letterSpacing: "0.35em",
+        color: "rgba(255,255,255,0.35)",
+        textTransform: "uppercase",
+        marginTop: "6px",
+      }}>
+        {item.label}
+      </div>
+      {i < 3 && (
+        <div style={{
+          position: "absolute",
+          right: "clamp(-14px, -3vw, -20px)",
+          top: "clamp(10px, 2vw, 18px)",
+          color: "rgba(212,168,42,0.4)",
+          fontSize: "clamp(24px, 5vw, 40px)",
+          fontWeight: 200,
+          lineHeight: 1,
+        }}>:</div>
+      )}
+    </div>
+  ))}
+</div>
 
       <div className="hero-scroll-cue" aria-hidden="true">
         <span>Scroll</span>
