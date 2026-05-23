@@ -570,7 +570,7 @@ function CountdownSection() {
   });
 
   useEffect(() => {
-    const target = new Date("2026-05-30T00:00:00").getTime();
+    const target = new Date("2026-06-12T00:00:00").getTime();
     const tick = () => {
       const diff = Math.max(0, target - Date.now());
       setTimeLeft({
