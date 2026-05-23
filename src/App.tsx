@@ -534,7 +534,7 @@ function HeroSection() {
         <div ref={detailsRef} className="hero-details">
           <div className="hero-detail-item">
             <span className="detail-label">Date</span>
-            <span className="detail-value">30th May, 2026</span>
+            <span className="detail-value">12th June, 2026</span>
           </div>
           <div className="hero-detail-divider" aria-hidden="true" />
           <div className="hero-detail-item">
