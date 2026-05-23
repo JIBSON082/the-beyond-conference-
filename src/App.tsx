@@ -773,7 +773,7 @@ function RegistrationSection() {
         <h2 className="section-heading reg-head">Register <em>Now</em></h2>
         <p className="reg-intro">
           The Beyond Conference 2026 is free to attend — but seats are limited.
-          Fill the form below to confirm your place on <strong>30th May, 2026</strong> at the
+          Fill the form below to confirm your place on <strong>12th June, 2026</strong> at the
           College of Medicine, LUTH, Lagos.
         </p>
 
@@ -1189,7 +1189,7 @@ function Footer() {
         </div>
         <div className="footer-event">
           <h4>Event Details</h4>
-          <p>30th May, 2026</p>
+          <p>12th June, 2026</p>
           <p>College of Medicine</p>
           <p>Lagos University Teaching Hospital</p>
           <p>Idi-Araba, Lagos</p>
