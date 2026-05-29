@@ -782,7 +782,7 @@ function RegistrationSection() {
             <div className="reg-success">
               <div className="reg-success-icon">✓</div>
               <h3>You're Registered!</h3>
-              <p>We've received your details. See you on 30th May 2026 — come ready for <em>MORE</em>.</p>
+              <p>We've received your details. See you on 12th June 2026 — come ready for <em>MORE</em>.</p>
               <button className="reg-submit-btn" onClick={() => setStatus('idle')}>
                 Register Another Person
               </button>
